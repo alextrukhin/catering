@@ -1,0 +1,19 @@
+{
+	"name": "prismaclient",
+	"private": true,
+	"version": "1.0.0",
+	"type": "module",
+	"scripts": {
+		"generate": "prisma generate",
+		"migrate-dev": "prisma migrate dev",
+		"migrate-dev-create-only": "prisma migrate dev --create-only",
+		"migrate-deploy": "prisma migrate deploy"
+	},
+	"devDependencies": {
+		"prisma": "7.6.0"
+	},
+	"dependencies": {
+		"@prisma/adapter-pg": "^7.6.0",
+		"@prisma/client": "7.6.0"
+	}
+}

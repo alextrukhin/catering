@@ -1,0 +1,361 @@
+generator client {
+  provider   = "prisma-client"
+  output     = "generated"
+  engineType = "client"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model CatererStaff {
+  id          Int              @id @default(autoincrement())
+  email       String           @unique
+  password    String
+  caterer_id  Int
+  first_name  String
+  last_name   String
+  middle_name String?
+  type        CatererStaffType
+  created_at  DateTime         @default(now())
+  updated_at  DateTime?        @updatedAt
+
+  Caterer Caterer @relation(fields: [caterer_id], references: [id])
+  Files   File[]
+}
+
+model OrgStaff {
+  id              Int          @id @default(autoincrement())
+  email           String       @unique
+  password        String
+  organization_id Int
+  first_name      String
+  last_name       String
+  middle_name     String?
+  type            OrgStaffType
+  created_at      DateTime     @default(now())
+  updated_at      DateTime?    @updatedAt
+
+  Organization Organization @relation(fields: [organization_id], references: [id])
+  Files        File[]
+}
+
+model Caterer {
+  id         Int       @id @default(autoincrement())
+  name       String
+  created_at DateTime  @default(now())
+  updated_at DateTime? @updatedAt
+
+  Staff     CatererStaff[]
+  Contracts CatererClientContract[]
+  Dishes    Dish[]
+  Meals     Meal[]
+}
+
+model CatererClientContract {
+  id              Int       @id @default(autoincrement())
+  caterer_id      Int
+  organization_id Int
+  valid_from      DateTime
+  valid_to        DateTime?
+  created_at      DateTime  @default(now())
+  updated_at      DateTime? @updatedAt
+
+  Caterer      Caterer      @relation(fields: [caterer_id], references: [id], onDelete: Cascade)
+  Organization Organization @relation(fields: [organization_id], references: [id], onDelete: Cascade)
+}
+
+model ClientTelegramBot {
+  id              Int       @id @default(autoincrement())
+  organization_id Int
+  token           String
+  valid_from      DateTime
+  valid_to        DateTime?
+  created_at      DateTime  @default(now())
+  updated_at      DateTime? @updatedAt
+
+  Organization Organization @relation(fields: [organization_id], references: [id], onDelete: Cascade)
+}
+
+model PlanDay {
+  id           Int       @id @default(autoincrement())
+  meal_plan_id Int
+  date         DateTime
+  created_at   DateTime  @default(now())
+  updated_at   DateTime? @updatedAt
+
+  MealPlan MealPlan       @relation(fields: [meal_plan_id], references: [id], onDelete: Cascade)
+  Diners   PlanDayDiner[]
+}
+
+model PlanDayDiner {
+  id          Int       @id @default(autoincrement())
+  plan_day_id Int
+  diner_id    Int
+  created_at  DateTime  @default(now())
+  updated_at  DateTime? @updatedAt
+
+  Diner   Diner                @relation(fields: [diner_id], references: [id], onDelete: Cascade)
+  PlanDay PlanDay              @relation(fields: [plan_day_id], references: [id], onDelete: Cascade)
+  Meals   DinerMealSelection[]
+
+  @@unique([plan_day_id, diner_id])
+}
+
+model DinerMealSelection {
+  id                Int @id @default(autoincrement())
+  plan_day_diner_id Int
+  plan_meal_id      Int
+
+  PlanDayDiner     PlanDayDiner           @relation(fields: [plan_day_diner_id], references: [id], onDelete: Cascade)
+  PlanMeal         PlanMeal               @relation(fields: [plan_meal_id], references: [id], onDelete: Cascade)
+  CourseSelections DinerCourseSelection[]
+
+  @@unique([plan_day_diner_id, plan_meal_id])
+}
+
+model DinerCourseSelection {
+  id                      Int @id @default(autoincrement())
+  diner_meal_selection_id Int
+  plan_course_id          Int
+
+  DinerMealSelection DinerMealSelection   @relation(fields: [diner_meal_selection_id], references: [id], onDelete: Cascade)
+  PlanCourse         PlanCourse           @relation(fields: [plan_course_id], references: [id], onDelete: Cascade)
+  DishSelections     DinerDishSelection[]
+
+  @@unique([diner_meal_selection_id, plan_course_id])
+}
+
+model DinerDishSelection {
+  id                        Int @id @default(autoincrement())
+  diner_course_selection_id Int
+  course_option_id          Int
+
+  DinerCourseSelection DinerCourseSelection @relation(fields: [diner_course_selection_id], references: [id], onDelete: Cascade)
+  CourseOption         CourseOption         @relation(fields: [course_option_id], references: [id], onDelete: Cascade)
+
+  @@unique([diner_course_selection_id, course_option_id])
+}
+
+// A meal plan assigns a set of meals to an organization's diners over a period
+model MealPlan {
+  id              Int       @id @default(autoincrement())
+  organization_id Int
+  label           String
+  valid_from      DateTime
+  valid_to        DateTime?
+  created_at      DateTime  @default(now())
+  updated_at      DateTime? @updatedAt
+
+  Meals        PlanMeal[]
+  Days         PlanDay[]
+  Organization Organization @relation(fields: [organization_id], references: [id], onDelete: Cascade)
+}
+
+// A meal (e.g. lunch) included in a plan
+model PlanMeal {
+  id           Int @id @default(autoincrement())
+  meal_plan_id Int
+  meal_id      Int
+
+  MealPlan            MealPlan             @relation(fields: [meal_plan_id], references: [id], onDelete: Cascade)
+  Meal                Meal                 @relation(fields: [meal_id], references: [id], onDelete: Cascade)
+  DinerMealSelections DinerMealSelection[]
+  Courses             PlanCourse[]
+
+  @@unique([meal_plan_id, meal_id])
+}
+
+// A course enabled within a plan meal — allows customizing which courses are active per plan
+model PlanCourse {
+  id           Int @id @default(autoincrement())
+  plan_meal_id Int
+  course_id    Int
+
+  PlanMeal              PlanMeal               @relation(fields: [plan_meal_id], references: [id], onDelete: Cascade)
+  Course                Course                 @relation(fields: [course_id], references: [id], onDelete: Cascade)
+  DinerCourseSelections DinerCourseSelection[]
+
+  @@unique([plan_meal_id, course_id])
+}
+
+// dinner, lunch, breakfast, etc. — meal template
+model Meal {
+  id         Int       @id @default(autoincrement())
+  label      String
+  caterer_id Int
+  valid_from DateTime
+  valid_to   DateTime?
+  created_at DateTime  @default(now())
+  updated_at DateTime? @updatedAt
+
+  Courses   Course[]
+  PlanMeals PlanMeal[]
+  Caterer   Caterer    @relation(fields: [caterer_id], references: [id], onDelete: Cascade)
+}
+
+// A course within a meal template (e.g. "Soup", "Main", "Dessert")
+model Course {
+  id      Int    @id @default(autoincrement())
+  meal_id Int
+  label   String
+
+  Options     CourseOption[]
+  Meal        Meal           @relation(fields: [meal_id], references: [id], onDelete: Cascade)
+  PlanCourses PlanCourse[]
+}
+
+// A dish available as an option within a course
+model CourseOption {
+  id        Int @id @default(autoincrement())
+  course_id Int
+  dish_id   Int
+
+  Course              Course               @relation(fields: [course_id], references: [id], onDelete: Cascade)
+  Dish                Dish                 @relation(fields: [dish_id], references: [id], onDelete: Cascade)
+  DinerDishSelections DinerDishSelection[]
+
+  @@unique([course_id, dish_id])
+}
+
+model Dish {
+  id         Int       @id @default(autoincrement())
+  name       String
+  caterer_id Int
+  valid_from DateTime
+  valid_to   DateTime?
+  created_at DateTime  @default(now())
+  updated_at DateTime? @updatedAt
+
+  Caterer Caterer        @relation(fields: [caterer_id], references: [id], onDelete: Cascade)
+  Prices  DishPrice[]
+  Options CourseOption[]
+}
+
+model DishPrice {
+  id         Int       @id @default(autoincrement())
+  dish_id    Int
+  price      Float
+  valid_from DateTime
+  valid_to   DateTime?
+  created_at DateTime  @default(now())
+  updated_at DateTime? @updatedAt
+
+  Dish Dish @relation(fields: [dish_id], references: [id], onDelete: Cascade)
+}
+
+model Organization {
+  id         Int       @id @default(autoincrement())
+  created_at DateTime  @default(now())
+  updated_at DateTime? @updatedAt
+
+  Admins       OrgStaff[]
+  Diners       Diner[]
+  Guardians    Guardian[]
+  Contracts    CatererClientContract[]
+  TelegramBots ClientTelegramBot[]
+  MealPlans    MealPlan[]
+}
+
+model Diner {
+  id              Int       @id @default(autoincrement())
+  first_name      String
+  last_name       String
+  middle_name     String?
+  email           String    @unique
+  organization_id Int
+  created_at      DateTime  @default(now())
+  updated_at      DateTime? @updatedAt
+
+  Organization Organization    @relation(fields: [organization_id], references: [id], onDelete: Cascade)
+  Passkeys     DinerPasskey[]
+  Guardians    GuardianDiner[]
+  PlanDays     PlanDayDiner[]
+}
+
+model Guardian {
+  id              Int       @id @default(autoincrement())
+  first_name      String
+  last_name       String
+  middle_name     String?
+  email           String    @unique
+  organization_id Int
+  created_at      DateTime  @default(now())
+  updated_at      DateTime? @updatedAt
+
+  Organization Organization      @relation(fields: [organization_id], references: [id], onDelete: Cascade)
+  Passkeys     GuardianPasskey[]
+  Diners       GuardianDiner[]
+}
+
+model GuardianDiner {
+  id          Int       @id @default(autoincrement())
+  guardian_id Int
+  diner_id    Int
+  created_at  DateTime  @default(now())
+  updated_at  DateTime? @updatedAt
+
+  Guardian Guardian @relation(fields: [guardian_id], references: [id], onDelete: Cascade)
+  Diner    Diner    @relation(fields: [diner_id], references: [id], onDelete: Cascade)
+
+  @@unique([guardian_id, diner_id])
+}
+
+model DinerPasskey {
+  id              Int       @id @default(autoincrement())
+  diner_id        Int
+  public_key      String
+  passkey_user_id String
+  backed_up       Boolean   @default(false)
+  name            String
+  transports      String[]
+  created_at      DateTime  @default(now())
+  updated_at      DateTime? @updatedAt
+
+  Diner Diner @relation(fields: [diner_id], references: [id], onDelete: Cascade)
+}
+
+model GuardianPasskey {
+  id              Int       @id @default(autoincrement())
+  guardian_id     Int
+  public_key      String
+  passkey_user_id String
+  backed_up       Boolean   @default(false)
+  name            String
+  transports      String[]
+  created_at      DateTime  @default(now())
+  updated_at      DateTime? @updatedAt
+
+  Guardian Guardian @relation(fields: [guardian_id], references: [id], onDelete: Cascade)
+}
+
+model File {
+  id                        Int          @id @default(autoincrement())
+  uuid                      String       @unique @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name                      String
+  path                      String
+  type                      String
+  size                      Int
+  provider                  FileProvider
+  uploader_org_admin_id     Int?
+  uploader_caterer_staff_id Int?
+  createdAt                 DateTime     @default(now())
+  updatedAt                 DateTime?    @updatedAt
+
+  OrgStaffUploader     OrgStaff?     @relation(fields: [uploader_org_admin_id], references: [id], onDelete: SetNull)
+  CatererStaffUploader CatererStaff? @relation(fields: [uploader_caterer_staff_id], references: [id], onDelete: SetNull)
+}
+
+enum FileProvider {
+  LOCAL_S3
+}
+
+enum CatererStaffType {
+  ADMIN
+  STAFF
+}
+
+enum OrgStaffType {
+  ADMIN
+  STAFF
+}

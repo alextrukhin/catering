@@ -1,0 +1,51 @@
+{
+	"name": "catering-crm-nuxt",
+	"description": "Corporate Catering Management Web Application with Individual Meal Plan Selection",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"build": "nuxt build",
+		"dev": "nuxt dev",
+		"preview": "nuxt preview",
+		"postinstall": "nuxt prepare",
+		"lint": "eslint .",
+		"typecheck": "nuxt typecheck"
+	},
+	"dependencies": {
+		"@iconify-json/lucide": "^1.2.100",
+		"@iconify-json/simple-icons": "^1.2.75",
+		"@internationalized/date": "^3.12.0",
+		"@noble/hashes": "^2.0.1",
+		"@noble/post-quantum": "^0.5.4",
+		"@nuxt/ui": "^4.6.0",
+		"@sentry/nuxt": "^10.46.0",
+		"@tanstack/table-core": "^8.21.3",
+		"@trpc/client": "^11.16.0",
+		"@trpc/server": "^11.16.0",
+		"@unovis/ts": "^1.6.4",
+		"@unovis/vue": "^1.6.4",
+		"@vueuse/core": "^14.2.1",
+		"@vueuse/nuxt": "^14.2.1",
+		"date-fns": "^4.1.0",
+		"jsonwebtoken": "^9.0.3",
+		"mime-types": "^3.0.2",
+		"nuxt": "^4.4.2",
+		"prismaclient": "workspace:*",
+		"sharp": "latest",
+		"tailwindcss": "^4.2.2",
+		"trpc-nuxt": "^2.0.2",
+		"uuid": "^13.0.0",
+		"vue": "^3.5.31",
+		"zod": "^4.3.6",
+		"zod-form-data": "^3.0.1"
+	},
+	"devDependencies": {
+		"@nuxt/eslint": "^1.15.2",
+		"@types/jsonwebtoken": "^9.0.10",
+		"@types/mime-types": "^3.0.1",
+		"eslint": "^10.1.0",
+		"typescript": "^5.9.3",
+		"vue-tsc": "^3.2.6"
+	},
+	"packageManager": "pnpm@11.0.0-beta.2+sha512.728d59d899a332fb79bfa2563010cc18c73f063044ca299c7465a76f406b7e8038b87ed6e140952c9b08943faab7e7e4172db0a10386f74601c3a72d068dfca2"
+}
