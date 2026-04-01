@@ -11,6 +11,8 @@ if (!isDev) {
 }
 
 export default defineNuxtConfig({
+	ssr: false,
+
 	modules,
 
 	runtimeConfig: {

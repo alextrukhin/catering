@@ -1,13 +1,13 @@
-import { Prisma, readClient } from "prismaclient";
+import { Prisma, readClient, writeClient } from "prismaclient";
 import { TRPCError } from "@trpc/server";
 import {
 	withOptionalOrgStaffProcedure,
 	orgStaffProcedure,
 	router,
-} from "../trpc";
+} from "../../trpc";
 import { hashPassword, verifyPassword } from "~~/server/utils/auth";
 import jsonwebtoken from "jsonwebtoken";
-import { signInSchema } from "~~/shared/types/auth";
+import { signInSchema, signUpSchema } from "~~/shared/types/auth";
 
 const orgStaffSelect = {
 	id: true,
@@ -55,6 +55,57 @@ const userRouter = router({
 
 			const { password: _, ...safeStaff } = staff;
 			return { staff: safeStaff };
+		}),
+
+	register: withOptionalOrgStaffProcedure
+		.input(signUpSchema)
+		.mutation(async ({ input, ctx: { event } }) => {
+			const existing = await readClient.orgStaff.findFirst({
+				where: {
+					email: {
+						equals: input.email,
+						mode: Prisma.QueryMode.insensitive,
+					},
+				},
+				select: { id: true },
+			});
+
+			if (existing) {
+				throw new TRPCError({
+					code: "CONFLICT",
+					message: "An account with this email already exists",
+				});
+			}
+
+			const staff = await writeClient.$transaction(async (tx) => {
+				const org = await tx.organization.create({ data: {} });
+				return tx.orgStaff.create({
+					data: {
+						email: input.email.toLowerCase(),
+						password: hashPassword(input.password),
+						first_name: input.first_name,
+						last_name: input.last_name,
+						type: "ADMIN",
+						organization_id: org.id,
+					},
+					select: orgStaffSelect,
+				});
+			});
+
+			const ageDays = input.remember_me ? 30 : 7;
+			const token = jsonwebtoken.sign(
+				{ id: staff.id, email: staff.email },
+				process.env.JWT_SECRET!,
+				{ expiresIn: `${ageDays}d` }
+			);
+			const maxAge = 60 * 60 * 24 * ageDays;
+			setCookie(event, "jwt_org", token, { httpOnly: true, maxAge });
+			setCookie(event, "org_authenticated", "true", {
+				httpOnly: false,
+				maxAge,
+			});
+
+			return { staff };
 		}),
 
 	logout: withOptionalOrgStaffProcedure.mutation(({ ctx: { event } }) => {

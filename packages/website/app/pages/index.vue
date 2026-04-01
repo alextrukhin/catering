@@ -83,7 +83,7 @@
 <script setup lang="ts">
 const portals = [
 	{
-		to: "/org",
+		to: "/org/signup",
 		label: "Organization",
 		description: "Manage schools, staff, and overall system configuration.",
 		icon: "i-heroicons-building-library",
@@ -91,7 +91,7 @@ const portals = [
 		iconColor: "text-blue-600 dark:text-blue-400",
 	},
 	{
-		to: "/catering",
+		to: "/catering/signup",
 		label: "Catering",
 		description: "Plan menus, track orders, and oversee meal preparation.",
 		icon: "i-heroicons-fire",
@@ -99,7 +99,7 @@ const portals = [
 		iconColor: "text-orange-600 dark:text-orange-400",
 	},
 	{
-		to: "/diner",
+		to: "/diner/signup",
 		label: "Diner",
 		description: "Browse meal plans, select dishes, and manage your account.",
 		icon: "i-heroicons-face-smile",
@@ -107,7 +107,7 @@ const portals = [
 		iconColor: "text-green-600 dark:text-green-400",
 	},
 	{
-		to: "/guardian",
+		to: "/guardian/signup",
 		label: "Guardian",
 		description: "Monitor children's meals, nutrition, and payment history.",
 		icon: "i-heroicons-heart",
