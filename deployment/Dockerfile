@@ -28,7 +28,7 @@ FROM prisma-build AS build-cron
 WORKDIR /app/packages/cron
 RUN pnpm build
 WORKDIR /app
-RUN pnpm --filter catering-cron deploy --prod /cron-prod \
+RUN pnpm --filter catering-cron deploy --prod /cron-prod --legacy \
     && cp -r /app/packages/cron/dist /cron-prod/dist
 
 FROM node:26-alpine3.22 AS website
