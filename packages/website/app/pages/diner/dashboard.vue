@@ -214,7 +214,8 @@ async function addPasskey() {
 		toast.add({ title: t("dashboard.passkey_success"), color: "success" });
 		passkeyModalOpen.value = false;
 		passkeyName.value = "";
-	} catch {
+	} catch (ex) {
+		console.error(ex);
 		toast.add({ title: t("dashboard.passkey_failed"), color: "error" });
 	} finally {
 		passkeyBusy.value = false;
