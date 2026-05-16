@@ -24,10 +24,10 @@ jobs:
         run: "cp /home/alex/node/mealplan/.env . && cp /home/alex/node/mealplan/website.env ./packages/website/ && cp /home/alex/node/mealplan/prisma.env ./packages/prisma/ && cp /home/alex/node/mealplan/cron.env ./packages/cron/"
 
       - name: Stop existing containers
-        run: "docker-compose -p catering_${NUXT_PUBLIC_APP_ENV} -f ./deployment/docker-compose.yml down || true"
+        run: "docker compose -p catering_${NUXT_PUBLIC_APP_ENV} -f ./deployment/docker-compose.yml down || true"
 
       - name: Build docker image
-        run: "docker-compose -p catering_${NUXT_PUBLIC_APP_ENV} -f ./deployment/docker-compose.yml build"
+        run: "docker compose -p catering_${NUXT_PUBLIC_APP_ENV} -f ./deployment/docker-compose.yml build"
 
       - name: Restart with new image
-        run: "docker-compose -p catering_${NUXT_PUBLIC_APP_ENV} -f ./deployment/docker-compose.yml up -d --force-recreate --remove-orphans --scale web=1"
+        run: "docker compose -p catering_${NUXT_PUBLIC_APP_ENV} -f ./deployment/docker-compose.yml up -d --force-recreate --remove-orphans --scale web=1"
