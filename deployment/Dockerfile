@@ -34,6 +34,7 @@ RUN pnpm --filter catering-cron deploy --prod /cron-prod --legacy \
 FROM node:26-alpine3.22 AS website
 WORKDIR /app/packages/website
 COPY --from=build-website --chown=node:node /app/packages/website/.output/ /app/packages/website/.output/
+COPY --from=build-website --chown=node:node /app/packages/website/.env /app/.env
 COPY --from=prisma-build --chown=node:node /app/packages/prisma /app/packages/prisma
 COPY --from=prisma-build --chown=node:node /app/deployment/run.sh /app/deployment/run.sh
 WORKDIR /app
