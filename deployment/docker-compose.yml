@@ -2,7 +2,7 @@ networks:
   catering_production_backend:
     driver: bridge
     internal: true
-  catering_${NUXT_PUBLIC_APP_ENV}_frontend:
+  catering_production_frontend:
     driver: bridge
     internal: false
 
@@ -24,7 +24,7 @@ services:
       - rustfs
     networks:
       - catering_production_backend
-      - catering_${NUXT_PUBLIC_APP_ENV}_frontend
+      - catering_production_frontend
     env_file:
       - ../.env
 
