@@ -1,5 +1,5 @@
 networks:
-  catering_${NUXT_PUBLIC_APP_ENV}_backend:
+  catering_production_backend:
     driver: bridge
     internal: true
   catering_${NUXT_PUBLIC_APP_ENV}_frontend:
@@ -23,7 +23,7 @@ services:
       - postgres_db
       - rustfs
     networks:
-      - catering_${NUXT_PUBLIC_APP_ENV}_backend
+      - catering_production_backend
       - catering_${NUXT_PUBLIC_APP_ENV}_frontend
     env_file:
       - ../.env
@@ -41,7 +41,7 @@ services:
     depends_on:
       - postgres_db
     networks:
-      - catering_${NUXT_PUBLIC_APP_ENV}_backend
+      - catering_production_backend
     env_file:
       - ../.env
 
@@ -53,7 +53,7 @@ services:
     expose:
       - "5432"
     networks:
-      - catering_${NUXT_PUBLIC_APP_ENV}_backend
+      - catering_production_backend
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: maybe_postgres_pass
@@ -72,7 +72,7 @@ services:
       - "9000"
       - "9001"
     networks:
-      - catering_${NUXT_PUBLIC_APP_ENV}_backend
+      - catering_production_backend
     volumes:
       - /home/alex/node/diploma/${NUXT_PUBLIC_APP_ENV}/s3/data:/data
       - /home/alex/node/diploma/${NUXT_PUBLIC_APP_ENV}/s3/logs:/logs
