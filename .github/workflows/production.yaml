@@ -24,7 +24,7 @@ jobs:
         run: "cp /home/alex/node/mealplan/.env . && cp /home/alex/node/mealplan/website.env ./packages/website/ && cp /home/alex/node/mealplan/prisma.env ./packages/prisma/ && cp /home/alex/node/mealplan/cron.env ./packages/cron/"
 
       - name: Load .env into GitHub environment
-        run: grep -v '^#' .env | grep '=' | sed 's/^export //' | tr -d '"' >> $GITHUB_ENV
+        run: grep -v '^#' .env | grep '=' | sed 's/^export //' | tr -d '"\r' >> $GITHUB_ENV
 
       - name: Stop existing containers
         run: "docker compose -p catering_${NUXT_PUBLIC_APP_ENV} -f ./deployment/docker-compose.yml down || true"
