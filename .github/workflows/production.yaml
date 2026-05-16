@@ -21,7 +21,7 @@ jobs:
         run: echo "APP_VERSION=${GITHUB_REF_NAME}-$(date +'%Y%m%d')" >> $GITHUB_ENV
 
       - name: Copy environment file
-        run: "cp /home/alex/node/mealplan/.env . && cp /home/alex/node/mealplan/website.env ./packages/website/ && cp /home/alex/node/mealplan/prisma.env ./packages/prisma/ && cp /home/alex/node/mealplan/cron.env ./packages/cron/"
+        run: "cp /home/alex/node/mealplan/.env . && cp /home/alex/node/mealplan/website.env ./packages/website/.env && cp /home/alex/node/mealplan/prisma.env ./packages/prisma/.env && cp /home/alex/node/mealplan/cron.env ./packages/cron/.env"
 
       - name: Load .env into GitHub environment
         run: grep -v '^#' .env | grep '=' | sed 's/^export //' | tr -d '"\r' >> $GITHUB_ENV
