@@ -43,4 +43,4 @@ FROM node:26-alpine3.22 AS cron
 COPY --from=build-cron --chown=node:node /cron-prod /app
 COPY --from=build-cron --chown=node:node /app/packages/cron/.env /app/.env
 WORKDIR /app
-CMD ["node", "dist/index.mjs"]
+CMD ["node", "--env-file=.env", "dist/index.mjs"]
