@@ -148,7 +148,7 @@ export default router({
 				select: {
 					id: true,
 					dish_id: true,
-					Dish: { select: { id: true, name: true } },
+					Dish: { select: { id: true, name_uk: true, name_en: true } },
 				},
 			});
 		}),
