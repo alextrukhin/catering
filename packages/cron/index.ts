@@ -8,6 +8,8 @@ const TICK_MS = 60_000;
 const MSG_PER_SECOND = 29;
 
 const db = readClient;
+
+console.log("process.env.READ_DATABASE_URL", process.env.READ_DATABASE_URL);
 const APP_URL = process.env.ORIGIN ?? "http://localhost:3000";
 
 function nowUtcHHMM(): string {
