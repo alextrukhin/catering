@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useWebApp } from "vue-tg";
+import { useMiniApp } from "vue-tg";
 
 definePageMeta({ layout: "diner" });
 
@@ -7,7 +7,7 @@ const { $client } = useNuxtApp();
 const { t } = useI18n();
 const toast = useToast();
 
-const webApp = useWebApp();
+const webApp = useMiniApp();
 const isInTelegram = computed(() => !!webApp.initData);
 
 // Sessions

@@ -5,7 +5,7 @@ import {
 	startAuthentication,
 	startRegistration,
 } from "@simplewebauthn/browser";
-import { useWebApp } from "vue-tg";
+import { useMiniApp } from "vue-tg";
 
 definePageMeta({
 	layout: "default",
@@ -24,7 +24,7 @@ watch(
 	{ immediate: true }
 );
 
-const webApp = useWebApp();
+const webApp = useMiniApp();
 const orgId = computed(() => Number(route.query.org_id) || null);
 
 onMounted(async () => {
