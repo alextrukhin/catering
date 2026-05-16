@@ -61,7 +61,7 @@ services:
       POSTGRES_HOST: postgres_db
       POSTGRES_SCHEMA: public
     volumes:
-      - /home/alex/node/diploma/${NUXT_PUBLIC_APP_ENV}/postgres:/var/lib/postgresql/data
+      - /home/alex/node/mealplan/${NUXT_PUBLIC_APP_ENV}/postgres:/var/lib/postgresql/data
 
   # Local S3 service
   rustfs:
@@ -75,5 +75,5 @@ services:
     networks:
       - catering_production_backend
     volumes:
-      - /home/alex/node/diploma/${NUXT_PUBLIC_APP_ENV}/s3/data:/data
-      - /home/alex/node/diploma/${NUXT_PUBLIC_APP_ENV}/s3/logs:/logs
+      - /home/alex/node/mealplan/${NUXT_PUBLIC_APP_ENV}/s3/data:/data
+      - /home/alex/node/mealplan/${NUXT_PUBLIC_APP_ENV}/s3/logs:/logs
