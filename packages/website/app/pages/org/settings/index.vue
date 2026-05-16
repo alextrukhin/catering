@@ -1,158 +1,180 @@
 <script setup lang="ts">
-import * as z from 'zod'
-import type { FormSubmitEvent } from '@nuxt/ui'
+definePageMeta({ layout: "org" });
 
-const fileRef = ref<HTMLInputElement>()
+const { $client } = useNuxtApp();
+const { t } = useI18n();
+const toast = useToast();
 
-const profileSchema = z.object({
-  name: z.string().min(2, 'Too short'),
-  email: z.string().email('Invalid email'),
-  username: z.string().min(2, 'Too short'),
-  avatar: z.string().optional(),
-  bio: z.string().optional()
-})
+const { data: settings, refresh } = await $client.org.settings.get.useQuery(
+	undefined,
+	{ lazy: true }
+);
 
-type ProfileSchema = z.output<typeof profileSchema>
+const botToken = ref("");
+const notificationTime = ref("");
+const botBusy = ref(false);
+const removeConfirmOpen = ref(false);
 
-const profile = reactive<Partial<ProfileSchema>>({
-  name: 'Benjamin Canac',
-  email: 'ben@nuxtlabs.com',
-  username: 'benjamincanac',
-  avatar: undefined,
-  bio: undefined
-})
-const toast = useToast()
-async function onSubmit(event: FormSubmitEvent<ProfileSchema>) {
-  toast.add({
-    title: 'Success',
-    description: 'Your settings have been updated.',
-    icon: 'i-lucide-check',
-    color: 'success'
-  })
-  console.log(event.data)
+async function saveBot() {
+	if (!botToken.value) return;
+	botBusy.value = true;
+	try {
+		await $client.org.settings.setupBot.mutate({
+			bot_token: botToken.value,
+			notification_time: notificationTime.value || undefined,
+		});
+		toast.add({ title: t("settings.bot_saved"), color: "success" });
+		botToken.value = "";
+		await refresh();
+	} catch (e: any) {
+		toast.add({ title: e?.message ?? t("settings.error"), color: "error" });
+	} finally {
+		botBusy.value = false;
+	}
 }
 
-function onFileChange(e: Event) {
-  const input = e.target as HTMLInputElement
-
-  if (!input.files?.length) {
-    return
-  }
-
-  profile.avatar = URL.createObjectURL(input.files[0]!)
+async function removeBot() {
+	botBusy.value = true;
+	try {
+		await $client.org.settings.removeBot.mutate();
+		toast.add({ title: t("settings.bot_removed"), color: "success" });
+		removeConfirmOpen.value = false;
+		await refresh();
+	} catch {
+		toast.add({ title: t("settings.error"), color: "error" });
+	} finally {
+		botBusy.value = false;
+	}
 }
 
-function onFileClick() {
-  fileRef.value?.click()
+async function saveNotificationTime() {
+	botBusy.value = true;
+	try {
+		await $client.org.settings.updateNotificationTime.mutate({
+			notification_time: notificationTime.value || null,
+		});
+		toast.add({ title: t("settings.saved"), color: "success" });
+		await refresh();
+	} catch {
+		toast.add({ title: t("settings.error"), color: "error" });
+	} finally {
+		botBusy.value = false;
+	}
 }
+
+watch(settings, (val) => {
+	if (val?.notification_time) notificationTime.value = val.notification_time;
+});
 </script>
 
 <template>
-  <UForm
-    id="settings"
-    :schema="profileSchema"
-    :state="profile"
-    @submit="onSubmit"
-  >
-    <UPageCard
-      title="Profile"
-      description="These informations will be displayed publicly."
-      variant="naked"
-      orientation="horizontal"
-      class="mb-4"
-    >
-      <UButton
-        form="settings"
-        label="Save changes"
-        color="neutral"
-        type="submit"
-        class="w-fit lg:ms-auto"
-      />
-    </UPageCard>
+	<div class="max-w-2xl mx-auto px-4 py-8 space-y-8">
+		<h1 class="text-xl font-bold text-highlighted">
+			{{ $t("settings.title") }}
+		</h1>
 
-    <UPageCard variant="subtle">
-      <UFormField
-        name="name"
-        label="Name"
-        description="Will appear on receipts, invoices, and other communication."
-        required
-        class="flex max-sm:flex-col justify-between items-start gap-4"
-      >
-        <UInput
-          v-model="profile.name"
-          autocomplete="off"
-        />
-      </UFormField>
-      <USeparator />
-      <UFormField
-        name="email"
-        label="Email"
-        description="Used to sign in, for email receipts and product updates."
-        required
-        class="flex max-sm:flex-col justify-between items-start gap-4"
-      >
-        <UInput
-          v-model="profile.email"
-          type="email"
-          autocomplete="off"
-        />
-      </UFormField>
-      <USeparator />
-      <UFormField
-        name="username"
-        label="Username"
-        description="Your unique username for logging in and your profile URL."
-        required
-        class="flex max-sm:flex-col justify-between items-start gap-4"
-      >
-        <UInput
-          v-model="profile.username"
-          type="username"
-          autocomplete="off"
-        />
-      </UFormField>
-      <USeparator />
-      <UFormField
-        name="avatar"
-        label="Avatar"
-        description="JPG, GIF or PNG. 1MB Max."
-        class="flex max-sm:flex-col justify-between sm:items-center gap-4"
-      >
-        <div class="flex flex-wrap items-center gap-3">
-          <UAvatar
-            :src="profile.avatar"
-            :alt="profile.name"
-            size="lg"
-          />
-          <UButton
-            label="Choose"
-            color="neutral"
-            @click="onFileClick"
-          />
-          <input
-            ref="fileRef"
-            type="file"
-            class="hidden"
-            accept=".jpg, .jpeg, .png, .gif"
-            @change="onFileChange"
-          >
-        </div>
-      </UFormField>
-      <USeparator />
-      <UFormField
-        name="bio"
-        label="Bio"
-        description="Brief description for your profile. URLs are hyperlinked."
-        class="flex max-sm:flex-col justify-between items-start gap-4"
-        :ui="{ container: 'w-full' }"
-      >
-        <UTextarea
-          v-model="profile.bio"
-          :rows="5"
-          autoresize
-          class="w-full"
-        />
-      </UFormField>
-    </UPageCard>
-  </UForm>
+		<UCard>
+			<template #header>
+				<div class="flex items-center gap-2 font-semibold">
+					<UIcon name="i-lucide-bot" class="size-4 text-primary" />
+					{{ $t("settings.telegram_bot") }}
+				</div>
+			</template>
+
+			<div class="space-y-4 p-1">
+				<template v-if="settings?.bot_configured">
+					<div class="flex items-center justify-between">
+						<div class="flex items-center gap-2 text-sm">
+							<UIcon
+								name="i-lucide-check-circle"
+								class="size-4 text-green-500"
+							/>
+							<span>
+								{{ $t("settings.bot_active") }}
+								<span class="text-muted">(bot id: {{ settings.bot_id }})</span>
+							</span>
+						</div>
+						<UButton
+							size="xs"
+							color="error"
+							variant="soft"
+							:label="$t('settings.bot_remove')"
+							@click="removeConfirmOpen = true"
+						/>
+					</div>
+
+					<USeparator />
+
+					<div class="space-y-2">
+						<p class="text-sm font-medium">
+							{{ $t("settings.notification_time") }}
+						</p>
+						<p class="text-xs text-muted">
+							{{ $t("settings.notification_time_desc") }}
+						</p>
+						<div class="flex items-center gap-2">
+							<UInput v-model="notificationTime" type="time" class="w-32" />
+							<UButton
+								size="sm"
+								:label="$t('settings.save')"
+								:loading="botBusy"
+								@click="saveNotificationTime"
+							/>
+						</div>
+					</div>
+				</template>
+
+				<template v-else>
+					<p class="text-sm text-muted">{{ $t("settings.bot_setup_desc") }}</p>
+					<div class="space-y-3">
+						<UFormField :label="$t('settings.bot_token')">
+							<UInput
+								v-model="botToken"
+								placeholder="123456789:AAFxxxxxxxxxxxxxxxxxxxxxxxx"
+								class="w-full font-mono text-sm"
+								type="password"
+							/>
+						</UFormField>
+						<UFormField :label="$t('settings.notification_time')">
+							<UInput v-model="notificationTime" type="time" class="w-32" />
+						</UFormField>
+						<UButton
+							:label="$t('settings.bot_save')"
+							:loading="botBusy"
+							:disabled="!botToken"
+							@click="saveBot"
+						/>
+					</div>
+				</template>
+			</div>
+		</UCard>
+	</div>
+
+	<UModal
+		v-model:open="removeConfirmOpen"
+		:title="$t('settings.bot_remove_confirm_title')"
+	>
+		<template #body>
+			<div class="p-4">
+				<p class="text-sm text-muted">
+					{{ $t("settings.bot_remove_confirm_desc") }}
+				</p>
+			</div>
+		</template>
+		<template #footer>
+			<div class="flex justify-end gap-2">
+				<UButton
+					variant="ghost"
+					:label="$t('settings.cancel')"
+					@click="removeConfirmOpen = false"
+				/>
+				<UButton
+					color="error"
+					:label="$t('settings.bot_remove')"
+					:loading="botBusy"
+					@click="removeBot"
+				/>
+			</div>
+		</template>
+	</UModal>
 </template>

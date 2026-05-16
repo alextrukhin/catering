@@ -1,69 +1,75 @@
 <script setup lang="ts">
-import { sub } from 'date-fns'
-import type { DropdownMenuItem } from '@nuxt/ui'
-import type { Period, Range } from '~/types'
+const perks = [
+	{ icon: "i-lucide-calendar", key: "meal_plans" },
+	{ icon: "i-lucide-users", key: "diner_management" },
+	{ icon: "i-lucide-bar-chart-2", key: "reports" },
+	{ icon: "i-lucide-handshake", key: "catering" },
+] as const;
 
-const { isNotificationsSlideoverOpen } = useDashboard()
+const { t } = useI18n();
+const { $orgStaff } = useNuxtApp();
+const router = useRouter();
 
-const items = [[{
-  label: 'New mail',
-  icon: 'i-lucide-send',
-  to: '/inbox'
-}, {
-  label: 'New customer',
-  icon: 'i-lucide-user-plus',
-  to: '/customers'
-}]] satisfies DropdownMenuItem[][]
+watch(
+	$orgStaff.isAuthorized,
+	(value) => {
+		if (value) router.replace("/org/dashboard");
+	},
+	{ immediate: true }
+);
 
-const range = shallowRef<Range>({
-  start: sub(new Date(), { days: 14 }),
-  end: new Date()
-})
-const period = ref<Period>('daily')
+definePageMeta({ layout: false });
 </script>
 
 <template>
-  <UDashboardPanel id="home">
-    <template #header>
-      <UDashboardNavbar title="Home" :ui="{ right: 'gap-3' }">
-        <template #leading>
-          <UDashboardSidebarCollapse />
-        </template>
+	<div>
+		<NuxtLayout name="default">
+			<template #header-actions>
+				<UButton
+					to="/org/signin"
+					variant="ghost"
+					:label="t('auth.sign_in_link')"
+				/>
+				<UButton to="/org/signup" :label="t('auth.sign_up_link')" />
+			</template>
 
-        <template #right>
-          <UTooltip text="Notifications" :shortcuts="['N']">
-            <UButton
-              color="neutral"
-              variant="ghost"
-              square
-              @click="isNotificationsSlideoverOpen = true"
-            >
-              <UChip color="error" inset>
-                <UIcon name="i-lucide-bell" class="size-5 shrink-0" />
-              </UChip>
-            </UButton>
-          </UTooltip>
+			<main class="flex-1 flex flex-col items-center px-6 py-20 gap-16">
+				<div class="text-center max-w-2xl">
+					<h1
+						class="text-4xl font-bold tracking-tight text-highlighted sm:text-5xl"
+					>
+						{{ t("landing.org.title") }}
+					</h1>
+					<p class="mt-6 text-lg text-muted">
+						{{ t("landing.org.subtitle") }}
+					</p>
+					<div class="mt-10 flex items-center justify-center gap-4 flex-wrap">
+						<UButton to="/org/signup" size="xl" :label="t('landing.org.cta')" />
+						<UButton
+							to="/org/signin"
+							size="xl"
+							variant="outline"
+							:label="t('auth.sign_in_link')"
+						/>
+					</div>
+				</div>
 
-          <UDropdownMenu :items="items">
-            <UButton icon="i-lucide-plus" size="md" class="rounded-full" />
-          </UDropdownMenu>
-        </template>
-      </UDashboardNavbar>
-
-      <UDashboardToolbar>
-        <template #left>
-          <!-- NOTE: The `-ms-1` class is used to align with the `DashboardSidebarCollapse` button here. -->
-          <HomeDateRangePicker v-model="range" class="-ms-1" />
-
-          <HomePeriodSelect v-model="period" :range="range" />
-        </template>
-      </UDashboardToolbar>
-    </template>
-
-    <template #body>
-      <HomeStats :period="period" :range="range" />
-      <HomeChart :period="period" :range="range" />
-      <HomeSales :period="period" :range="range" />
-    </template>
-  </UDashboardPanel>
+				<div class="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-2xl w-full">
+					<div
+						v-for="perk in perks"
+						:key="perk.key"
+						class="flex items-start gap-4 rounded-xl border border-default p-5 bg-elevated"
+					>
+						<UIcon
+							:name="perk.icon"
+							class="size-6 text-primary shrink-0 mt-0.5"
+						/>
+						<p class="text-sm text-default">
+							{{ t(`landing.org.perks.${perk.key}`) }}
+						</p>
+					</div>
+				</div>
+			</main>
+		</NuxtLayout>
+	</div>
 </template>

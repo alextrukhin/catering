@@ -1,0 +1,78 @@
+networks:
+  catering_${NUXT_PUBLIC_APP_ENV}_backend:
+    driver: bridge
+    internal: true
+  catering_${NUXT_PUBLIC_APP_ENV}_frontend:
+    driver: bridge
+    internal: false
+
+services:
+  # Nuxt.js service
+  web:
+    container_name: website_${NUXT_PUBLIC_APP_ENV}
+    build:
+      context: "../"
+      dockerfile: "./deployment/Dockerfile"
+      target: website
+      args:
+        - APP_VERSION=${APP_VERSION:-dev}
+    restart: always
+    ports:
+      - "${APP_PORT:-80}:3000"
+    depends_on:
+      - postgres_db
+      - rustfs
+    networks:
+      - catering_${NUXT_PUBLIC_APP_ENV}_backend
+      - catering_${NUXT_PUBLIC_APP_ENV}_frontend
+    env_file:
+      - ../.env
+
+  # Notification cron service
+  cron:
+    container_name: cron_${NUXT_PUBLIC_APP_ENV}
+    build:
+      context: "../"
+      dockerfile: "./deployment/Dockerfile"
+      target: cron
+      args:
+        - APP_VERSION=${APP_VERSION:-dev}
+    restart: always
+    depends_on:
+      - postgres_db
+    networks:
+      - catering_${NUXT_PUBLIC_APP_ENV}_backend
+    env_file:
+      - ../.env
+
+  # Postgresql service
+  postgres_db:
+    image: postgis/postgis:latest
+    container_name: postgres_${NUXT_PUBLIC_APP_ENV}
+    restart: unless-stopped
+    expose:
+      - "5432"
+    networks:
+      - catering_${NUXT_PUBLIC_APP_ENV}_backend
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: maybe_postgres_pass
+      POSTGRES_DB: mealplan
+      POSTGRES_HOST: postgres_db
+      POSTGRES_SCHEMA: public
+    volumes:
+      - /home/alex/node/diploma/${NUXT_PUBLIC_APP_ENV}/postgres:/var/lib/postgresql/data
+
+  # Local S3 service
+  rustfs:
+    image: rustfs/rustfs:latest
+    container_name: s3_${NUXT_PUBLIC_APP_ENV}
+    restart: unless-stopped
+    expose:
+      - "9000"
+      - "9001"
+    networks:
+      - catering_${NUXT_PUBLIC_APP_ENV}_backend
+    volumes:
+      - /home/alex/node/diploma/${NUXT_PUBLIC_APP_ENV}/s3/data:/data
+      - /home/alex/node/diploma/${NUXT_PUBLIC_APP_ENV}/s3/logs:/logs

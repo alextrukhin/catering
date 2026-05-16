@@ -10,10 +10,6 @@ export default defineNuxtPlugin((nuxtApp) => {
 		string | boolean | null
 	>;
 
-	const { data: user, refresh } = $client.org.user.me.useQuery(undefined, {
-		lazy: true,
-	});
-
 	const isAuthorized = computed({
 		get: () =>
 			isAuthorizedCookie.value === "true" || isAuthorizedCookie.value === true,
@@ -22,25 +18,19 @@ export default defineNuxtPlugin((nuxtApp) => {
 		},
 	});
 
-	const login = async (payload: {
-		email: string;
-		password: string;
-		remember_me: boolean;
-	}) => {
-		await $client.org.user.login.mutate(payload);
-		await refresh();
-	};
+	const { data: user, refresh } = $client.org.user.me.useQuery(undefined, {
+		immediate: false,
+	});
 
-	const register = async (payload: {
-		first_name: string;
-		last_name: string;
-		email: string;
-		password: string;
-		remember_me?: boolean;
-	}) => {
-		await $client.org.user.register.mutate(payload);
-		await refresh();
-	};
+	watch(
+		isAuthorized,
+		(newVal) => {
+			if (newVal) {
+				void refresh();
+			}
+		},
+		{ immediate: true }
+	);
 
 	const logout = async () => {
 		try {
@@ -56,8 +46,7 @@ export default defineNuxtPlugin((nuxtApp) => {
 			orgStaff: {
 				isAuthorized,
 				user,
-				login,
-				register,
+				refresh,
 				logout,
 			},
 		},

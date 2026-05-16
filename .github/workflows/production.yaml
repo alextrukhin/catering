@@ -1,0 +1,33 @@
+name: production
+on:
+  push:
+    branches:
+      - production
+
+jobs:
+  Build-and-Deploy-front:
+    runs-on: [self-hosted, X64, Linux, production]
+    name: Build and deploy
+
+    steps:
+      - name: Set current date to tag the built image with
+        id: version
+        run: echo "builddate=$(date +'%Y-%m-%dT%H-%M-%S')" >> $GITHUB_OUTPUT
+
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set APP_VERSION
+        run: echo "APP_VERSION=${GITHUB_REF_NAME}-$(date +'%Y%m%d')" >> $GITHUB_ENV
+
+      - name: Copy environment file
+        run: "cp /home/alex/node/mealplan/.env . && cp /home/alex/node/mealplan/website.env ./packages/website/ && cp /home/alex/node/mealplan/prisma.env ./packages/prisma/ && cp /home/alex/node/mealplan/cron.env ./packages/cron/"
+
+      - name: Stop existing containers
+        run: "docker-compose -p catering_${NUXT_PUBLIC_APP_ENV} -f ./deployment/docker-compose.yml down || true"
+
+      - name: Build docker image
+        run: "docker-compose -p catering_${NUXT_PUBLIC_APP_ENV} -f ./deployment/docker-compose.yml build"
+
+      - name: Restart with new image
+        run: "docker-compose -p catering_${NUXT_PUBLIC_APP_ENV} -f ./deployment/docker-compose.yml up -d --force-recreate --remove-orphans --scale web=1"

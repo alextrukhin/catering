@@ -1,35 +1,58 @@
-<template>
-	<div class="min-h-screen bg-[var(--ui-bg)] flex flex-col">
-		<header
-			class="border-b border-[var(--ui-border)] px-6 py-4 flex items-center justify-between"
-		>
-			<div class="flex items-center gap-2">
-				<UIcon
-					name="i-heroicons-building-office-2"
-					class="size-7 text-primary"
-				/>
-				<span class="text-lg font-semibold text-[var(--ui-text-highlighted)]">
-					MealPlan
-				</span>
-			</div>
-			<UColorModeButton />
-		</header>
+<script setup lang="ts">
+const { t } = useI18n();
 
+const portals = computed(() => [
+	{
+		to: "/org",
+		label: t("landing.org.label"),
+		description: t("landing.org.description"),
+		icon: "i-heroicons-building-library",
+		iconBg: "bg-blue-100 dark:bg-blue-950",
+		iconColor: "text-blue-600 dark:text-blue-400",
+	},
+	{
+		to: "/catering",
+		label: t("landing.catering.label"),
+		description: t("landing.catering.description"),
+		icon: "i-heroicons-fire",
+		iconBg: "bg-orange-100 dark:bg-orange-950",
+		iconColor: "text-orange-600 dark:text-orange-400",
+	},
+	{
+		to: "/diner",
+		label: t("landing.diner.label"),
+		description: t("landing.diner.description"),
+		icon: "i-heroicons-face-smile",
+		iconBg: "bg-green-100 dark:bg-green-950",
+		iconColor: "text-green-600 dark:text-green-400",
+	},
+	{
+		to: "/guardian",
+		label: t("landing.guardian.label"),
+		description: t("landing.guardian.description"),
+		icon: "i-heroicons-heart",
+		iconBg: "bg-purple-100 dark:bg-purple-950",
+		iconColor: "text-purple-600 dark:text-purple-400",
+	},
+]);
+</script>
+
+<template>
+	<div class="min-h-screen bg-default flex flex-col">
 		<main
 			class="flex-1 flex flex-col items-center justify-center px-6 py-16 gap-16"
 		>
 			<div class="text-center max-w-2xl flex flex-col items-center gap-4">
-				<UBadge label="School Catering Management" variant="subtle" />
+				<UBadge :label="t('landing.badge')" variant="subtle" />
 				<h1
-					class="text-4xl sm:text-5xl font-bold tracking-tight text-[var(--ui-text-highlighted)]"
+					class="text-4xl sm:text-5xl font-bold tracking-tight text-highlighted"
 				>
-					One platform,
+					{{ t("landing.hero_title_1") }}
 					<br />
-					every role covered
+					{{ t("landing.hero_title_2") }}
 				</h1>
-				<p class="text-lg text-[var(--ui-text-muted)] max-w-xl">
-					Manage school catering operations, meal plans, and student nutrition —
-					all in one place.
+				<p class="text-lg text-muted max-w-xl">
+					{{ t("landing.hero_subtitle") }}
 				</p>
 			</div>
 
@@ -40,7 +63,7 @@
 					v-for="portal in portals"
 					:key="portal.to"
 					:to="portal.to"
-					class="group relative rounded-2xl border border-[var(--ui-border)] bg-[var(--ui-bg-elevated)] p-6 flex flex-col gap-4 hover:border-primary hover:shadow-lg transition-all duration-200 cursor-pointer"
+					class="group relative rounded-2xl border border-default bg-elevated p-6 flex flex-col gap-4 hover:border-primary hover:shadow-lg transition-all duration-200 cursor-pointer"
 				>
 					<div
 						class="size-12 rounded-xl flex items-center justify-center"
@@ -53,19 +76,17 @@
 						/>
 					</div>
 					<div class="flex flex-col gap-1 flex-1">
-						<span
-							class="font-semibold text-[var(--ui-text-highlighted)] text-base"
-						>
+						<span class="font-semibold text-highlighted text-base">
 							{{ portal.label }}
 						</span>
-						<span class="text-sm text-[var(--ui-text-muted)] leading-snug">
+						<span class="text-sm text-muted leading-snug">
 							{{ portal.description }}
 						</span>
 					</div>
 					<div
 						class="flex items-center gap-1 text-sm font-medium text-primary opacity-0 group-hover:opacity-100 transition-opacity duration-200"
 					>
-						Open portal
+						{{ t("landing.open_portal") }}
 						<UIcon name="i-heroicons-arrow-right" class="size-4" />
 					</div>
 				</NuxtLink>
@@ -73,46 +94,10 @@
 		</main>
 
 		<footer
-			class="border-t border-[var(--ui-border)] px-6 py-5 text-center text-sm text-[var(--ui-text-muted)]"
+			class="border-t border-default px-6 py-5 text-center text-sm text-muted"
 		>
-			&copy; {{ new Date().getFullYear() }} MealPlan. All rights reserved.
+			&copy; {{ new Date().getFullYear() }} {{ t("landing.mealplan") }}.
+			{{ t("landing.all_rights_reserved") }}
 		</footer>
 	</div>
 </template>
-
-<script setup lang="ts">
-const portals = [
-	{
-		to: "/org/signup",
-		label: "Organization",
-		description: "Manage schools, staff, and overall system configuration.",
-		icon: "i-heroicons-building-library",
-		iconBg: "bg-blue-100 dark:bg-blue-950",
-		iconColor: "text-blue-600 dark:text-blue-400",
-	},
-	{
-		to: "/catering/signup",
-		label: "Catering",
-		description: "Plan menus, track orders, and oversee meal preparation.",
-		icon: "i-heroicons-fire",
-		iconBg: "bg-orange-100 dark:bg-orange-950",
-		iconColor: "text-orange-600 dark:text-orange-400",
-	},
-	{
-		to: "/diner/signup",
-		label: "Diner",
-		description: "Browse meal plans, select dishes, and manage your account.",
-		icon: "i-heroicons-face-smile",
-		iconBg: "bg-green-100 dark:bg-green-950",
-		iconColor: "text-green-600 dark:text-green-400",
-	},
-	{
-		to: "/guardian/signup",
-		label: "Guardian",
-		description: "Monitor children's meals, nutrition, and payment history.",
-		icon: "i-heroicons-heart",
-		iconBg: "bg-purple-100 dark:bg-purple-950",
-		iconColor: "text-purple-600 dark:text-purple-400",
-	},
-];
-</script>

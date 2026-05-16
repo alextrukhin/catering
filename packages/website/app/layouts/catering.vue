@@ -1,142 +1,90 @@
 <script setup lang="ts">
 import type { NavigationMenuItem } from "@nuxt/ui";
 
-const route = useRoute();
-const toast = useToast();
+const { $catererStaff } = useNuxtApp();
+
+const { locale, t } = useI18n();
+const catererName = computed(() => {
+	const c = $catererStaff.user.value?.Caterer;
+	if (!c) return undefined;
+	return locale.value === "uk" ? c.name_uk : c.name_en;
+});
+const catererUser = computed(() => $catererStaff.user.value);
 
 const open = ref(false);
 
-const links = [
+const close = () => {
+	open.value = false;
+};
+
+const links = computed((): NavigationMenuItem[][] => [
 	[
 		{
-			label: "Home",
+			label: t("nav.dashboard"),
 			icon: "i-lucide-house",
-			to: "/",
-			onSelect: () => {
-				open.value = false;
-			},
+			to: "/catering/dashboard",
+			onSelect: close,
 		},
 		{
-			label: "Inbox",
-			icon: "i-lucide-inbox",
-			to: "/inbox",
-			badge: "4",
-			onSelect: () => {
-				open.value = false;
-			},
+			label: t("nav.contracts"),
+			icon: "i-lucide-file-text",
+			to: "/catering/contracts",
+			onSelect: close,
 		},
 		{
-			label: "Customers",
-			icon: "i-lucide-users",
-			to: "/customers",
-			onSelect: () => {
-				open.value = false;
-			},
+			label: t("nav.invite_codes"),
+			icon: "i-lucide-ticket",
+			to: "/catering/invite-codes",
+			onSelect: close,
 		},
 		{
-			label: "Settings",
-			to: "/settings",
+			label: t("nav.meals"),
+			icon: "i-lucide-utensils",
+			to: "/catering/meals",
+			onSelect: close,
+		},
+		{
+			label: t("nav.dishes"),
+			icon: "i-lucide-chef-hat",
+			to: "/catering/dishes",
+			onSelect: close,
+		},
+		{
+			label: t("nav.courses"),
+			icon: "i-lucide-book-open",
+			to: "/catering/courses",
+			onSelect: close,
+		},
+		{
+			label: t("nav.settings"),
+			to: "/catering/settings",
 			icon: "i-lucide-settings",
 			defaultOpen: true,
 			type: "trigger",
 			children: [
 				{
-					label: "General",
-					to: "/settings",
+					label: t("nav.general"),
+					to: "/catering/settings",
 					exact: true,
-					onSelect: () => {
-						open.value = false;
-					},
+					onSelect: close,
 				},
 				{
-					label: "Members",
-					to: "/settings/members",
-					onSelect: () => {
-						open.value = false;
-					},
-				},
-				{
-					label: "Notifications",
-					to: "/settings/notifications",
-					onSelect: () => {
-						open.value = false;
-					},
-				},
-				{
-					label: "Security",
-					to: "/settings/security",
-					onSelect: () => {
-						open.value = false;
-					},
+					label: t("nav.members"),
+					to: "/catering/settings/members",
+					onSelect: close,
 				},
 			],
 		},
 	],
-	[
-		{
-			label: "Feedback",
-			icon: "i-lucide-message-circle",
-			to: "https://github.com/nuxt-ui-templates/dashboard",
-			target: "_blank",
-		},
-		{
-			label: "Help & Support",
-			icon: "i-lucide-info",
-			to: "https://github.com/nuxt-ui-templates/dashboard",
-			target: "_blank",
-		},
-	],
-] satisfies NavigationMenuItem[][];
+]);
 
 const groups = computed(() => [
 	{
 		id: "links",
-		label: "Go to",
-		items: links.flat(),
-	},
-	{
-		id: "code",
-		label: "Code",
-		items: [
-			{
-				id: "source",
-				label: "View page source",
-				icon: "i-simple-icons-github",
-				to: `https://github.com/nuxt-ui-templates/dashboard/blob/main/app/pages${route.path === "/" ? "/index" : route.path}.vue`,
-				target: "_blank",
-			},
-		],
+		label: t("nav.go_to"),
+		items: links.value.flat(),
 	},
 ]);
-
-onMounted(async () => {
-	const cookie = useCookie("cookie-consent");
-	if (cookie.value === "accepted") {
-		return;
-	}
-
-	toast.add({
-		title:
-			"We use first-party cookies to enhance your experience on our website.",
-		duration: 0,
-		close: false,
-		actions: [
-			{
-				label: "Accept",
-				color: "neutral",
-				variant: "outline",
-				onClick: () => {
-					cookie.value = "accepted";
-				},
-			},
-			{
-				label: "Opt out",
-				color: "neutral",
-				variant: "ghost",
-			},
-		],
-	});
-});
 </script>
 
 <template>
@@ -150,7 +98,7 @@ onMounted(async () => {
 			:ui="{ footer: 'lg:border-t lg:border-default' }"
 		>
 			<template #header="{ collapsed }">
-				<TeamsMenu :collapsed="collapsed" />
+				<TeamsMenu :collapsed="collapsed" :name="catererName" />
 			</template>
 
 			<template #default="{ collapsed }">
@@ -166,18 +114,14 @@ onMounted(async () => {
 					tooltip
 					popover
 				/>
-
-				<UNavigationMenu
-					:collapsed="collapsed"
-					:items="links[1]"
-					orientation="vertical"
-					tooltip
-					class="mt-auto"
-				/>
 			</template>
 
 			<template #footer="{ collapsed }">
-				<UserMenu :collapsed="collapsed" />
+				<UserMenu
+					:collapsed="collapsed"
+					:user="catererUser"
+					logout-to="/catering/logout"
+				/>
 			</template>
 		</UDashboardSidebar>
 

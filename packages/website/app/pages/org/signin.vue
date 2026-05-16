@@ -6,16 +6,15 @@ definePageMeta({
 	layout: "default",
 });
 
-const { $orgStaff } = useNuxtApp();
+const router = useRouter();
+const { $orgStaff, $client } = useNuxtApp();
 const route = useRoute();
+const { t } = useI18n();
 
 watch(
 	$orgStaff.isAuthorized,
-	async (value) => {
-		console.log("Authorization status changed:", value);
-		if (value) {
-			await navigateTo("/org/dashboard");
-		}
+	(value) => {
+		if (value) router.replace("/org/dashboard");
 	},
 	{ immediate: true }
 );
@@ -30,18 +29,20 @@ const submit = async () => {
 	error.value = "";
 	loading.value = true;
 	try {
-		await $orgStaff.login({
+		await $client.org.user.login.mutate({
 			email: email.value,
 			password: password.value,
 			remember_me: rememberMe.value,
 		});
-		await navigateTo(
-			typeof route.query.redirect === "string" ? route.query.redirect : "/org"
+		router.replace(
+			typeof route.query.redirect === "string"
+				? route.query.redirect
+				: "/org/dashboard"
 		);
 	} catch (e) {
 		loading.value = false;
 		error.value =
-			e instanceof TRPCClientError ? e.message : "Failed to sign in";
+			e instanceof TRPCClientError ? e.message : t("auth.failed_sign_in");
 		captureException(e, {
 			extra: { payload: { email: email.value } },
 		});
@@ -54,18 +55,18 @@ const submit = async () => {
 		<div class="w-full max-w-sm space-y-6">
 			<div class="text-center">
 				<h1 class="text-2xl font-bold text-highlighted">
-					Sign in to your account
+					{{ t("auth.sign_in_title") }}
 				</h1>
 				<p class="mt-2 text-sm text-muted">
-					Don't have an account?
+					{{ t("auth.no_account") }}
 					<ULink to="/org/signup" class="text-primary font-medium">
-						Sign up
+						{{ t("auth.sign_up_link") }}
 					</ULink>
 				</p>
 			</div>
 
 			<form class="space-y-4" @submit.prevent="submit">
-				<UFormField label="Email">
+				<UFormField :label="t('auth.email')">
 					<UInput
 						v-model="email"
 						type="email"
@@ -76,26 +77,32 @@ const submit = async () => {
 					/>
 				</UFormField>
 
-				<UFormField label="Password">
+				<UFormField :label="t('auth.password')">
 					<UInput
 						v-model="password"
 						type="password"
 						autocomplete="current-password"
-						placeholder="••••••••"
+						:placeholder="t('auth.password_placeholder')"
 						size="lg"
 						class="w-full"
 					/>
 				</UFormField>
 
 				<div class="flex items-center justify-between">
-					<UCheckbox v-model="rememberMe" label="Remember me" />
+					<UCheckbox v-model="rememberMe" :label="t('auth.remember_me')" />
 				</div>
 
 				<p v-if="error" class="text-sm font-medium text-error">
 					{{ error }}
 				</p>
 
-				<UButton type="submit" label="Sign in" block size="lg" :loading />
+				<UButton
+					type="submit"
+					:label="t('auth.sign_in_button')"
+					block
+					size="lg"
+					:loading
+				/>
 			</form>
 		</div>
 	</div>

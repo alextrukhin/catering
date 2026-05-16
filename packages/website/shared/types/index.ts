@@ -23,6 +23,7 @@ export type Nullable<T> =
 const MAX_INT = 2147483647;
 
 export const IdSchema = z.number().int().positive().max(MAX_INT);
+export const idSchema = IdSchema;
 export const IndexSchema = z.number().int().nonnegative().max(MAX_INT);
 export const FileNamePartSchema = z.string().regex(/^[\w,\s-]+$/);
 export const colorHEXSchema = z.string().regex(/^#(?:[0-9a-fA-F]{3}){1,2}$/gm, {

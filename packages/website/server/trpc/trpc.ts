@@ -3,30 +3,33 @@ import jsonwebtoken from "jsonwebtoken";
 import type { H3Event } from "h3";
 import { readClient, CatererStaffType, OrgStaffType } from "prismaclient";
 
-type JWTPayload = { id: number; email: string; iat: number; exp: number };
+type SessionPayload = { session_id: number; iat: number; exp: number };
 
-const decodeJWT = (event: H3Event, cookieName: string) => {
+const resolveSession = async <T>(
+	event: H3Event,
+	cookieName: string,
+	entity: string,
+	fetch: (entity_id: number) => Promise<T | null>
+): Promise<T | null> => {
 	try {
 		const token = getCookie(event, cookieName);
 		if (!token) return null;
-		return jsonwebtoken.verify(token, process.env.JWT_SECRET!) as JWTPayload;
+		const { session_id } = jsonwebtoken.verify(
+			token,
+			process.env.JWT_SECRET!
+		) as SessionPayload;
+		const session = session_id
+			? await readClient.session.findUnique({
+					where: { id: session_id },
+				})
+			: null;
+		if (!session || session.entity !== entity || session.ended_at !== null)
+			return null;
+		return await fetch(session.entity_id);
 	} catch {
 		return null;
 	}
 };
-
-const makeGetUser =
-	<T>(cookieName: string, fetch: (id: number) => Promise<T | null>) =>
-	async (event: H3Event) => {
-		try {
-			const payload = decodeJWT(event, cookieName);
-			if (!payload) return null;
-			return await fetch(payload.id);
-		} catch (e) {
-			console.warn(e);
-			return null;
-		}
-	};
 
 const staffSelect = {
 	id: true,
@@ -37,26 +40,44 @@ const staffSelect = {
 	type: true,
 } as const;
 
+const orgStaffSelect = {
+	...staffSelect,
+	organization_id: true,
+} as const;
+
+const catererStaffSelect = {
+	...staffSelect,
+	caterer_id: true,
+} as const;
+
 const personSelect = {
 	id: true,
-	email: true,
+	phone: true,
 	first_name: true,
 	middle_name: true,
 	last_name: true,
+	organization_id: true,
 } as const;
 
-export const getEventOrgStaff = makeGetUser("jwt_org", (id) =>
-	readClient.orgStaff.findUnique({ where: { id }, select: staffSelect })
-);
-export const getEventCatererStaff = makeGetUser("jwt_caterer", (id) =>
-	readClient.catererStaff.findUnique({ where: { id }, select: staffSelect })
-);
-export const getEventDiner = makeGetUser("jwt_diner", (id) =>
-	readClient.diner.findUnique({ where: { id }, select: personSelect })
-);
-export const getEventGuardian = makeGetUser("jwt_guardian", (id) =>
-	readClient.guardian.findUnique({ where: { id }, select: personSelect })
-);
+export const getEventOrgStaff = (event: H3Event) =>
+	resolveSession(event, "jwt_org", "org_staff", (id) =>
+		readClient.orgStaff.findUnique({ where: { id }, select: orgStaffSelect })
+	);
+export const getEventCatererStaff = (event: H3Event) =>
+	resolveSession(event, "jwt_caterer", "caterer_staff", (id) =>
+		readClient.catererStaff.findUnique({
+			where: { id },
+			select: catererStaffSelect,
+		})
+	);
+export const getEventDiner = (event: H3Event) =>
+	resolveSession(event, "jwt_diner", "diner", (id) =>
+		readClient.diner.findUnique({ where: { id }, select: personSelect })
+	);
+export const getEventGuardian = (event: H3Event) =>
+	resolveSession(event, "jwt_guardian", "guardian", (id) =>
+		readClient.guardian.findUnique({ where: { id }, select: personSelect })
+	);
 
 type OrgStaffCtx = Awaited<ReturnType<typeof getEventOrgStaff>>;
 type CatererStaffCtx = Awaited<ReturnType<typeof getEventCatererStaff>>;
