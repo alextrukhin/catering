@@ -68,6 +68,7 @@ services:
     image: rustfs/rustfs:latest
     container_name: s3_${NUXT_PUBLIC_APP_ENV}
     restart: unless-stopped
+    user: root
     expose:
       - "9000"
       - "9001"
