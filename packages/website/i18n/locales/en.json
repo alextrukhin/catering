@@ -115,7 +115,7 @@
 		"bot_removed": "Bot removed",
 		"bot_remove_confirm_title": "Remove Telegram bot?",
 		"bot_remove_confirm_desc": "The webhook will be deleted and users will no longer receive notifications.",
-		"bot_setup_desc": "Enter your Telegram bot token (from @BotFather) to enable notifications and account linking.",
+		"bot_setup_desc": "Enter your Telegram bot token (from \\@BotFather) to enable notifications and account linking.",
 		"notification_time": "Notification time (UTC)",
 		"notification_time_desc": "Time to send daily meal reminders to diners (UTC).",
 		"save": "Save",
