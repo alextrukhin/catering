@@ -8,7 +8,7 @@ const UBadgeComp = resolveComponent("UBadge");
 
 const { $client } = useNuxtApp();
 const toast = useToast();
-const { t } = useI18n();
+const { t, locale } = useI18n();
 
 const { data: contracts, refresh } = $client.org.contracts.list.useQuery();
 
@@ -81,7 +81,7 @@ const columns = computed((): TableColumn<ContractRow>[] => [
 const rows = computed((): ContractRow[] =>
 	(contracts.value ?? []).map((c) => ({
 		...c,
-		caterer_name: c.Caterer.name_uk,
+		caterer_name: c.Caterer[`name_${locale.value}`] || c.Caterer.name_uk,
 		invite_code: c.InviteCode ? c.InviteCode.code : "—",
 		status:
 			new Date(c.valid_from) <= now &&

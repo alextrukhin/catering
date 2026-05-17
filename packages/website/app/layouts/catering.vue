@@ -7,7 +7,7 @@ const { locale, t } = useI18n();
 const catererName = computed(() => {
 	const c = $catererStaff.user.value?.Caterer;
 	if (!c) return undefined;
-	return locale.value === "uk" ? c.name_uk : c.name_en;
+	return c[`name_${locale.value}`] || c.name_uk;
 });
 const catererUser = computed(() => $catererStaff.user.value);
 

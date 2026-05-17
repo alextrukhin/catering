@@ -3,6 +3,7 @@ definePageMeta({ layout: "org" });
 
 const route = useRoute();
 const { $client } = useNuxtApp();
+const { locale } = useI18n();
 
 const dayId = computed(() => Number(route.params.id));
 
@@ -58,7 +59,11 @@ function getDish(
 		(s) => s.plan_course_id === planCourseId
 	);
 	if (!sel) return null;
-	return sel.CourseOption.Dish.name_uk ?? null;
+	return (
+		sel.CourseOption.Dish[`name_${locale.value}`] ||
+		sel.CourseOption.Dish.name_uk ||
+		null
+	);
 }
 
 function selectionCount(diner: DinerEntry) {
@@ -86,7 +91,13 @@ const groups = computed((): Group[] => {
 		const key = primary?.id ?? null;
 		let g = map.get(key);
 		if (!g) {
-			g = { id: key, name: primary?.name_uk ?? "Ungrouped", diners: [] };
+			g = {
+				id: key,
+				name: primary
+					? primary[`name_${locale.value}`] || primary.name_uk
+					: "Ungrouped",
+				diners: [],
+			};
 			map.set(key, g);
 		}
 		g.diners.push(entry);
@@ -155,7 +166,7 @@ async function removeDiner(planDayDinerId: number) {
 					<div v-if="day" class="flex flex-col leading-tight">
 						<span class="font-semibold capitalize">{{ dateLabel }}</span>
 						<span class="text-xs text-muted font-normal">
-							{{ day.MealPlan.label_uk }}
+							{{ day.MealPlan[`label_${locale}`] || day.MealPlan.label_uk }}
 						</span>
 					</div>
 					<span v-else class="text-muted">Loading…</span>

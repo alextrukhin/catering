@@ -2,6 +2,7 @@
 definePageMeta({ layout: "org" });
 
 const { $client } = useNuxtApp();
+const { locale } = useI18n();
 const toast = useToast();
 
 const today = new Date();
@@ -19,7 +20,7 @@ const dayMap = computed(() => {
 	for (const d of calDays.value ?? []) {
 		map.set(new Date(d.date).toISOString().slice(0, 10), {
 			id: d.id,
-			label: d.MealPlan.label_uk,
+			label: d.MealPlan[`label_${locale.value}`] || d.MealPlan.label_uk,
 		});
 	}
 	return map;
@@ -95,7 +96,7 @@ const dinerExtraGroups = computed(() => {
 	for (const g of rosterData.value.groups) {
 		for (const m of g.Members) {
 			const list = map.get(m.Diner.id) ?? [];
-			list.push(g.name_uk);
+			list.push(g[`name_${locale.value}`] || g.name_uk);
 			map.set(m.Diner.id, list);
 		}
 	}
@@ -278,7 +279,7 @@ const dateLabel = computed(() =>
 													name="i-lucide-users-round"
 													class="size-3.5 shrink-0"
 												/>
-												{{ group.name_uk }}
+												{{ group[`name_${locale}`] || group.name_uk }}
 												<span class="font-normal normal-case tracking-normal">
 													({{ group.Members.length }})
 												</span>

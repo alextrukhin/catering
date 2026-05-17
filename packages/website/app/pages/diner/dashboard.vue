@@ -125,19 +125,17 @@ const mealsView = computed<MealView[]>(() => {
 
 	return d.PlanDay.MealPlan.Meals.map((planMeal) => ({
 		plan_meal_id: planMeal.id,
-		label:
-			locale.value === "uk" ? planMeal.Meal.label_uk : planMeal.Meal.label_en,
+		label: planMeal.Meal[`label_${locale.value}`] || planMeal.Meal.label_uk,
 		courses: planMeal.Courses.map((planCourse) => {
 			const sel = selMap.get(planCourse.id) ?? null;
 			return {
 				plan_course_id: planCourse.id,
 				label:
-					locale.value === "uk"
-						? planCourse.Course.label_uk
-						: planCourse.Course.label_en,
+					planCourse.Course[`label_${locale.value}`] ||
+					planCourse.Course.label_uk,
 				options: planCourse.Course.Options.map((o) => ({
 					id: o.id,
-					name: locale.value === "uk" ? o.Dish.name_uk : o.Dish.name_en,
+					name: o.Dish[`name_${locale.value}`] || o.Dish.name_uk,
 					price: getCurrentPrice(o.Dish.Prices),
 					weight: o.Dish.weight ?? null,
 					ingredients: o.Dish.ingredients ?? [],

@@ -33,14 +33,13 @@ function formatSelections(
 	lang: string | null | undefined
 ): string {
 	if (selections.length === 0) return t(lang, "no_selection");
-	const isUk = (lang ?? "uk") === "uk";
 	return selections
 		.map((s) =>
 			t(lang, "course_line", {
-				course: isUk
-					? s.PlanCourse.Course.label_uk
-					: s.PlanCourse.Course.label_en,
-				dish: isUk ? s.CourseOption.Dish.name_uk : s.CourseOption.Dish.name_en,
+				course:
+					s.PlanCourse.Course[`label_${lang}`] || s.PlanCourse.Course.label_uk,
+				dish:
+					s.CourseOption.Dish[`name_${lang}`] || s.CourseOption.Dish.name_uk,
 			})
 		)
 		.join("\n");

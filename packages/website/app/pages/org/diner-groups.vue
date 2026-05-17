@@ -6,7 +6,7 @@ definePageMeta({ layout: "org" });
 const UBtn = resolveComponent("UButton");
 const { $client } = useNuxtApp();
 const toast = useToast();
-const { t } = useI18n();
+const { t, locale } = useI18n();
 
 const { data: groups, refresh } = $client.org.dinerGroups.list.useQuery();
 const { data: diners } = $client.org.diners.list.useQuery();
@@ -249,7 +249,7 @@ const columns = computed((): TableColumn<Group>[] => [
 	<!-- Manage members -->
 	<USlideover
 		v-model:open="membersOpen"
-		:title="`Members — ${activeGroup?.name_uk}`"
+		:title="`Members — ${activeGroup?.[`name_${locale}`] || activeGroup?.name_uk || ''}`"
 		side="right"
 	>
 		<template #body>

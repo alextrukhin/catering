@@ -7,7 +7,7 @@ const { locale, t } = useI18n();
 const orgName = computed(() => {
 	const o = $orgStaff.user.value?.Organization;
 	if (!o) return undefined;
-	return locale.value === "uk" ? o.name_uk : o.name_en;
+	return o[`name_${locale.value}`] || o.name_uk;
 });
 const orgUser = computed(() => $orgStaff.user.value);
 

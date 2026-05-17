@@ -6,7 +6,7 @@ definePageMeta({ layout: "catering" });
 const UBtn = resolveComponent("UButton");
 const { $client } = useNuxtApp();
 const toast = useToast();
-const { t } = useI18n();
+const { t, locale } = useI18n();
 
 const { data: courses, refresh } = $client.catering.courses.list.useQuery();
 const { data: meals } = $client.catering.meals.list.useQuery();
@@ -122,7 +122,10 @@ const optionIds = computed(
 const availableDishOptions = computed(() =>
 	(dishes.value ?? [])
 		.filter((d) => !optionIds.value.has(d.id))
-		.map((d) => ({ label: d.name_uk, value: d.id }))
+		.map((d) => ({
+			label: d[`name_${locale.value}`] || d.name_uk,
+			value: d.id,
+		}))
 );
 
 async function addOption() {
@@ -380,7 +383,9 @@ const rows = computed((): CourseRow[] =>
 							:key="opt.id"
 							class="flex items-center justify-between rounded-lg border border-default px-3 py-2"
 						>
-							<span class="text-sm">{{ opt.Dish.name_uk }}</span>
+							<span class="text-sm">
+								{{ opt.Dish[`name_${locale}`] || opt.Dish.name_uk }}
+							</span>
 							<UButton
 								size="xs"
 								variant="ghost"

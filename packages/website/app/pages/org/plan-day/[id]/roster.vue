@@ -4,6 +4,7 @@ definePageMeta({ layout: "org" });
 const route = useRoute();
 const { $client } = useNuxtApp();
 const toast = useToast();
+const { locale } = useI18n();
 
 const dayId = computed(() => Number(route.params.id));
 
@@ -50,7 +51,7 @@ const dinerExtraGroups = computed(() => {
 	for (const g of data.value.groups) {
 		for (const m of g.Members) {
 			const list = map.get(m.Diner.id) ?? [];
-			list.push(g.name_uk);
+			list.push(g[`name_${locale.value}`] || g.name_uk);
 			map.set(m.Diner.id, list);
 		}
 	}
@@ -158,7 +159,11 @@ const dateLabel = computed(() =>
 					<div v-if="data" class="flex flex-col leading-tight">
 						<span class="font-semibold capitalize">{{ dateLabel }}</span>
 						<span class="text-xs text-muted font-normal">
-							{{ data.day.MealPlan.label_uk }} &mdash; manage diners
+							{{
+								data.day.MealPlan[`label_${locale.value}`] ||
+								data.day.MealPlan.label_uk
+							}}
+							&mdash; manage diners
 						</span>
 					</div>
 					<span v-else class="text-muted">Loading...</span>

@@ -199,7 +199,7 @@ const mealsView = computed<MealView[]>(() => {
 						: planCourse.Course.label_en,
 				options: planCourse.Course.Options.map((o) => ({
 					id: o.id,
-					name: locale.value === "uk" ? o.Dish.name_uk : o.Dish.name_en,
+					name: o.Dish[`name_${locale.value}`] || o.Dish.name_uk,
 					price: getCurrentPrice(o.Dish.Prices),
 					weight: o.Dish.weight ?? null,
 					ingredients: o.Dish.ingredients ?? [],
