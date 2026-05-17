@@ -1,13 +1,16 @@
 <script setup lang="ts">
 import type { DayCell } from "~/components/MealCalendar.vue";
 import { startRegistration } from "@simplewebauthn/browser";
+import { useMiniApp } from "vue-tg";
 
 definePageMeta({ layout: "diner" });
 
 const { $client, $diner } = useNuxtApp();
 const { t, locale } = useI18n();
 const toast = useToast();
+const webApp = useMiniApp();
 
+const isInTelegram = computed(() => !!webApp.initData);
 const me = computed(() => $diner.user.value);
 
 const today = new Date();
@@ -280,6 +283,7 @@ async function executeCopy() {
 				</p>
 			</div>
 			<UButton
+				v-if="!isInTelegram"
 				variant="ghost"
 				size="sm"
 				icon="i-lucide-key-round"

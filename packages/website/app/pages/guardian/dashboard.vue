@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { DayCell } from "~/components/MealCalendar.vue";
+import { useMiniApp } from "vue-tg";
 import { startRegistration } from "@simplewebauthn/browser";
 
 definePageMeta({ layout: "guardian" });
@@ -7,7 +7,9 @@ definePageMeta({ layout: "guardian" });
 const { $client, $guardian } = useNuxtApp();
 const { t, locale } = useI18n();
 const toast = useToast();
+const webApp = useMiniApp();
 
+const isInTelegram = computed(() => !!webApp.initData);
 const me = computed(() => $guardian.user.value);
 
 const { data: linkedDiners, pending: dinersPending } = await useAsyncData(
@@ -316,6 +318,7 @@ async function executeCopy() {
 				</p>
 			</div>
 			<UButton
+				v-if="!isInTelegram"
 				variant="ghost"
 				size="sm"
 				icon="i-lucide-key-round"
