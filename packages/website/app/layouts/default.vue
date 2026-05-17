@@ -1,5 +1,10 @@
 <script setup lang="ts">
 const toast = useToast();
+const { locale, setLocale } = useI18n();
+
+function toggleLang() {
+	setLocale(locale.value === "uk" ? "en" : "uk");
+}
 
 onMounted(async () => {
 	const cookie = useCookie("cookie-consent");
@@ -43,6 +48,12 @@ onMounted(async () => {
 				</span>
 			</NuxtLink>
 			<div class="flex items-center gap-3">
+				<UButton
+					variant="ghost"
+					size="sm"
+					:label="locale === 'uk' ? 'EN' : 'UK'"
+					@click="toggleLang"
+				/>
 				<UColorModeButton />
 				<slot name="header-actions" />
 			</div>
