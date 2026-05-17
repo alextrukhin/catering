@@ -138,26 +138,31 @@ async function tick(time: string) {
 						t(d.telegram_lang, "diner_header"),
 						formatSelections(selections, d.telegram_lang),
 					].join("\n");
-					try {
-						await bot.api
-							.sendMessage(Number(d.telegram_id), text, {
-								reply_markup: {
-									inline_keyboard: [
-										[
-											{
-												text: t(d.telegram_lang, "btn_diner"),
-												web_app: { url: `${APP_URL}/diner/dashboard` },
-											},
-										],
+
+					await bot.api
+						.sendMessage(Number(d.telegram_id), text, {
+							reply_markup: {
+								inline_keyboard: [
+									[
+										{
+											text: t(d.telegram_lang, "btn_diner"),
+											web_app: { url: `${APP_URL}/diner/dashboard` },
+										},
 									],
-								},
-							})
-							.then(() => {
-								console.log(`Message sent to diner ${d.id}`);
-							});
-					} catch (ex) {
-						console.error(ex);
-					}
+								],
+							},
+						})
+						.then(() => {
+							console.log(`Message sent to diner ${d.id}`);
+						})
+						.catch((ex) => {
+							console.error(
+								"Failed to send message to diner",
+								d.id,
+								d.telegram_id
+							);
+							console.error(ex);
+						});
 				})
 			);
 
@@ -187,26 +192,30 @@ async function tick(time: string) {
 						childLines || t(g.telegram_lang, "no_selection"),
 					].join("\n");
 
-					try {
-						await bot.api
-							.sendMessage(Number(g.telegram_id), text, {
-								reply_markup: {
-									inline_keyboard: [
-										[
-											{
-												text: t(g.telegram_lang, "btn_guardian"),
-												web_app: { url: `${APP_URL}/guardian/dashboard` },
-											},
-										],
+					await bot.api
+						.sendMessage(Number(g.telegram_id), text, {
+							reply_markup: {
+								inline_keyboard: [
+									[
+										{
+											text: t(g.telegram_lang, "btn_guardian"),
+											web_app: { url: `${APP_URL}/guardian/dashboard` },
+										},
 									],
-								},
-							})
-							.then(() => {
-								console.log(`Message sent to guardian ${g.id}`);
-							});
-					} catch (ex) {
-						console.error(ex);
-					}
+								],
+							},
+						})
+						.then(() => {
+							console.log(`Message sent to guardian ${g.id}`);
+						})
+						.catch((ex) => {
+							console.error(
+								"Failed to send message to guardian",
+								g.id,
+								g.telegram_id
+							);
+							console.error(ex);
+						});
 				})
 			);
 
