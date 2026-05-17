@@ -92,6 +92,7 @@ model PlanDay {
   Diners   PlanDayDiner[]
 
   @@unique([meal_plan_id, date])
+  @@index([date])
 }
 
 model PlanDayDiner {
@@ -106,6 +107,7 @@ model PlanDayDiner {
   DishSelections DinerDishSelection[]
 
   @@unique([plan_day_id, diner_id])
+  @@index([diner_id])
 }
 
 model DinerDishSelection {
