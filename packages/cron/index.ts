@@ -89,8 +89,6 @@ async function tick(time: string) {
 			},
 		});
 
-		console.log("planDayDiners", planDayDiners.length);
-
 		const selectionsByDiner = new Map(
 			planDayDiners.map((pdd) => [pdd.diner_id, pdd.DishSelections])
 		);
@@ -104,8 +102,6 @@ async function tick(time: string) {
 				telegram_lang: true,
 			},
 		});
-
-		console.log("diners", diners.length);
 
 		const guardians = await db.guardian.findMany({
 			where: { organization_id: org.id, telegram_id: { not: null } },
@@ -124,14 +120,10 @@ async function tick(time: string) {
 			},
 		});
 
-		console.log("guardians", guardians.length);
-
 		const dinerTasks = diners
 			.filter((d) => d.telegram_id != null)
 			.map((d) =>
 				limit(async () => {
-					console.log(`Sending message to diner ${d.id}, ${d.telegram_id}`);
-
 					const selections = selectionsByDiner.get(d.id) ?? [];
 					const text = [
 						t(d.telegram_lang, "greeting", { name: d.first_name }),
@@ -159,21 +151,17 @@ async function tick(time: string) {
 							console.error(
 								"Failed to send message to diner",
 								d.id,
-								d.telegram_id
+								d.telegram_id,
+								ex
 							);
-							console.error(ex);
 						});
 				})
 			);
-
-		console.log("dinerTasks", dinerTasks.length);
 
 		const guardianTasks = guardians
 			.filter((g) => g.telegram_id != null)
 			.map((g) =>
 				limit(async () => {
-					console.log(`Sending message to guardian ${g.id}, ${g.telegram_id}`);
-
 					const childLines = g.Diners.map(({ Diner: child }) => {
 						const sel = selectionsByDiner.get(child.id) ?? [];
 						return (
@@ -212,14 +200,12 @@ async function tick(time: string) {
 							console.error(
 								"Failed to send message to guardian",
 								g.id,
-								g.telegram_id
+								g.telegram_id,
+								ex
 							);
-							console.error(ex);
 						});
 				})
 			);
-
-		console.log("guardianTasks", guardianTasks.length);
 
 		await Promise.all([...dinerTasks, ...guardianTasks]);
 	}
