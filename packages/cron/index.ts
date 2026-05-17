@@ -130,7 +130,7 @@ async function tick(time: string) {
 			.filter((d) => d.telegram_id != null)
 			.map((d) =>
 				limit(async () => {
-					console.log(`Sending message to diner ${d.id}`);
+					console.log(`Sending message to diner ${d.id}, ${d.telegram_id}`);
 
 					const selections = selectionsByDiner.get(d.id) ?? [];
 					const text = [
@@ -139,18 +139,22 @@ async function tick(time: string) {
 						formatSelections(selections, d.telegram_lang),
 					].join("\n");
 					try {
-						await bot.api.sendMessage(Number(d.telegram_id), text, {
-							reply_markup: {
-								inline_keyboard: [
-									[
-										{
-											text: t(d.telegram_lang, "btn_diner"),
-											web_app: { url: `${APP_URL}/diner/dashboard` },
-										},
+						await bot.api
+							.sendMessage(Number(d.telegram_id), text, {
+								reply_markup: {
+									inline_keyboard: [
+										[
+											{
+												text: t(d.telegram_lang, "btn_diner"),
+												web_app: { url: `${APP_URL}/diner/dashboard` },
+											},
+										],
 									],
-								],
-							},
-						});
+								},
+							})
+							.then(() => {
+								console.log(`Message sent to diner ${d.id}`);
+							});
 					} catch (ex) {
 						console.error(ex);
 					}
@@ -163,7 +167,7 @@ async function tick(time: string) {
 			.filter((g) => g.telegram_id != null)
 			.map((g) =>
 				limit(async () => {
-					console.log(`Sending message to guardian ${g.id}`);
+					console.log(`Sending message to guardian ${g.id}, ${g.telegram_id}`);
 
 					const childLines = g.Diners.map(({ Diner: child }) => {
 						const sel = selectionsByDiner.get(child.id) ?? [];
@@ -184,18 +188,22 @@ async function tick(time: string) {
 					].join("\n");
 
 					try {
-						await bot.api.sendMessage(Number(g.telegram_id), text, {
-							reply_markup: {
-								inline_keyboard: [
-									[
-										{
-											text: t(g.telegram_lang, "btn_guardian"),
-											web_app: { url: `${APP_URL}/guardian/dashboard` },
-										},
+						await bot.api
+							.sendMessage(Number(g.telegram_id), text, {
+								reply_markup: {
+									inline_keyboard: [
+										[
+											{
+												text: t(g.telegram_lang, "btn_guardian"),
+												web_app: { url: `${APP_URL}/guardian/dashboard` },
+											},
+										],
 									],
-								],
-							},
-						});
+								},
+							})
+							.then(() => {
+								console.log(`Message sent to guardian ${g.id}`);
+							});
 					} catch (ex) {
 						console.error(ex);
 					}
