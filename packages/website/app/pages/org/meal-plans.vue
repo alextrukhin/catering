@@ -6,7 +6,7 @@ definePageMeta({ layout: "org" });
 const UBtn = resolveComponent("UButton");
 const { $client } = useNuxtApp();
 const toast = useToast();
-const { t } = useI18n();
+const { t, locale } = useI18n();
 
 const { data: plans, refresh } = $client.org.mealPlans.list.useQuery(
 	undefined,
@@ -515,7 +515,7 @@ function getCourseIds(pm: PlanMealItem) {
 											{ value: null, label: t('op.no_default') },
 											...c.Course.Options.map((o) => ({
 												value: o.id,
-												label: o.Dish.name_uk,
+												label: o.Dish[`name_${locale}`] || o.Dish.name_uk,
 											})),
 										]"
 										value-key="value"
@@ -568,11 +568,15 @@ function getCourseIds(pm: PlanMealItem) {
 							class="flex items-center justify-between rounded-lg border border-default p-3"
 						>
 							<div>
-								<div class="font-medium text-sm">{{ m.label_uk }}</div>
+								<div class="font-medium text-sm">
+									{{ m[`label_${locale}`] || m.label_uk }}
+								</div>
 								<div v-if="m.description" class="text-xs text-muted">
 									{{ m.description }}
 								</div>
-								<div class="text-xs text-muted">{{ m.Caterer.name_uk }}</div>
+								<div class="text-xs text-muted">
+									{{ m.Caterer[`name_${locale}`] || m.Caterer.name_uk }}
+								</div>
 							</div>
 							<UButton
 								size="sm"

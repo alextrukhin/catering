@@ -97,7 +97,7 @@ const activeContracts = computed(() =>
 						>
 							<div>
 								<div class="font-medium">
-									{{ c.Caterer[`name_${locale}`] ?? "" }}
+									{{ c.Caterer[`name_${locale}`] || c.Caterer.name_uk }}
 								</div>
 								<div class="text-sm text-muted">
 									{{ t("op.contract_from") }}

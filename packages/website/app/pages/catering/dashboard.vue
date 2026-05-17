@@ -112,7 +112,9 @@ const recentContracts = computed(() => (contracts.value ?? []).slice(0, 5));
 						>
 							<div>
 								<div class="font-medium">
-									{{ c.Organization[`name_${locale}`] ?? "" }}
+									{{
+										c.Organization[`name_${locale}`] || c.Organization.name_uk
+									}}
 								</div>
 								<div class="text-sm text-muted">
 									{{ new Date(c.valid_from).toLocaleDateString() }}
