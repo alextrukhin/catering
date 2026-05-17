@@ -143,7 +143,9 @@ async function tick(time: string) {
 								],
 							},
 						});
-					} catch {}
+					} catch (ex) {
+						console.error(ex);
+					}
 				})
 			);
 
