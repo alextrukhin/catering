@@ -89,6 +89,8 @@ async function tick(time: string) {
 			},
 		});
 
+		console.log("planDayDiners", planDayDiners.length);
+
 		const selectionsByDiner = new Map(
 			planDayDiners.map((pdd) => [pdd.diner_id, pdd.DishSelections])
 		);
@@ -102,6 +104,8 @@ async function tick(time: string) {
 				telegram_lang: true,
 			},
 		});
+
+		console.log("diners", diners.length);
 
 		const guardians = await db.guardian.findMany({
 			where: { organization_id: org.id, telegram_id: { not: null } },
@@ -119,6 +123,8 @@ async function tick(time: string) {
 				},
 			},
 		});
+
+		console.log("guardians", guardians.length);
 
 		const dinerTasks = diners
 			.filter((d) => d.telegram_id != null)
@@ -148,6 +154,8 @@ async function tick(time: string) {
 					}
 				})
 			);
+
+		console.log("dinerTasks", dinerTasks.length);
 
 		const guardianTasks = guardians
 			.filter((g) => g.telegram_id != null)
@@ -189,6 +197,8 @@ async function tick(time: string) {
 					}
 				})
 			);
+
+		console.log("guardianTasks", guardianTasks.length);
 
 		await Promise.all([...dinerTasks, ...guardianTasks]);
 	}
