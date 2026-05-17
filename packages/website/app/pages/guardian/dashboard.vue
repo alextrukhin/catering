@@ -452,130 +452,151 @@ async function executeCopy() {
 						</button>
 
 						<div v-if="expandedId === d.id" class="border-t border-default">
-							<div v-if="dayPending" class="flex justify-center py-6">
-								<UIcon
-									name="i-lucide-loader-circle"
-									class="size-6 animate-spin text-muted"
-								/>
-							</div>
-
-							<div v-else-if="dayData" class="p-4 space-y-4">
-								<div class="flex items-center justify-between">
-									<span
-										v-if="dayTotal !== null"
-										class="text-sm font-semibold text-highlighted"
-									>
-										{{
-											$t("dashboard.day_total", { total: dayTotal.toFixed(2) })
-										}}
-									</span>
-									<span v-else />
-									<UButton
-										variant="ghost"
-										size="xs"
-										icon="i-lucide-copy"
-										:label="$t('dashboard.copy_day')"
-										@click="openCopyModal(d.id)"
-									/>
-								</div>
-
-								<div
-									v-for="meal in mealsView"
-									:key="meal.plan_meal_id"
-									class="rounded-xl border border-default overflow-hidden"
-								>
-									<div class="px-4 py-2 bg-elevated/40 font-medium text-sm">
-										{{ meal.label }}
-									</div>
-									<div class="divide-y divide-default">
-										<div
-											v-for="course in meal.courses"
-											:key="course.plan_course_id"
-											class="px-4 py-3 space-y-1.5"
+							<div
+								class="p-4 space-y-4 transition-opacity duration-150"
+								:class="{
+									'opacity-50 pointer-events-none': dayPending || busy,
+								}"
+							>
+								<template v-if="dayData">
+									<div class="flex items-center justify-between">
+										<span
+											v-if="dayTotal !== null"
+											class="text-sm font-semibold text-highlighted"
 										>
-											<span class="text-sm text-muted">{{ course.label }}</span>
+											{{
+												$t("dashboard.day_total", {
+													total: dayTotal.toFixed(2),
+												})
+											}}
+										</span>
+										<span v-else />
+										<UButton
+											variant="ghost"
+											size="xs"
+											icon="i-lucide-copy"
+											:label="$t('dashboard.copy_day')"
+											@click="openCopyModal(d.id)"
+										/>
+									</div>
+
+									<div
+										v-for="meal in mealsView"
+										:key="meal.plan_meal_id"
+										class="rounded-xl border border-default overflow-hidden"
+									>
+										<div class="px-4 py-2 bg-elevated/40 font-medium text-sm">
+											{{ meal.label }}
+										</div>
+										<div class="divide-y divide-default">
 											<div
-												v-if="course.options.length > 0"
-												class="grid grid-cols-2 gap-2 mt-1.5"
+												v-for="course in meal.courses"
+												:key="course.plan_course_id"
+												class="px-4 py-3 space-y-1.5"
 											>
+												<span class="text-sm text-muted">
+													{{ course.label }}
+												</span>
 												<div
-													v-for="opt in course.options"
-													:key="opt.id"
-													class="relative rounded-lg border-2 cursor-pointer transition-all overflow-hidden"
-													:class="
-														course.selected_option_id === opt.id
-															? 'border-primary-500 bg-primary-50 dark:bg-primary-950'
-															: 'border-default hover:border-primary-300'
-													"
-													@click="onCourseOptionSelect(course, opt.id)"
+													v-if="course.options.length > 0"
+													class="grid grid-cols-2 gap-2 mt-1.5"
 												>
-													<img
-														v-if="opt.photo_id"
-														:src="`/api/dishes/${opt.dish_id}/photo`"
-														class="w-full h-20 object-cover"
-													/>
 													<div
-														v-else
-														class="w-full h-20 bg-elevated flex items-center justify-center"
+														v-for="opt in course.options"
+														:key="opt.id"
+														class="relative rounded-lg border-2 cursor-pointer transition-all overflow-hidden"
+														:class="
+															course.selected_option_id === opt.id
+																? 'border-primary-500 bg-primary-50 dark:bg-primary-950'
+																: 'border-default hover:border-primary-300'
+														"
+														@click="onCourseOptionSelect(course, opt.id)"
 													>
-														<UIcon
-															name="i-lucide-utensils"
-															class="size-6 text-muted"
+														<img
+															v-if="opt.photo_id"
+															:src="`/api/dishes/${opt.dish_id}/photo`"
+															class="w-full h-20 object-cover"
 														/>
-													</div>
-													<div class="p-2">
-														<p
-															class="text-xs font-medium text-highlighted leading-tight"
+														<div
+															v-else
+															class="w-full h-20 bg-elevated flex items-center justify-center"
 														>
-															{{ opt.name }}
-														</p>
-														<p
-															v-if="opt.price !== null"
-															class="text-xs text-primary-600 dark:text-primary-400 font-semibold mt-0.5"
+															<UIcon
+																name="i-lucide-utensils"
+																class="size-6 text-muted"
+															/>
+														</div>
+														<div class="p-2">
+															<p
+																class="text-xs font-medium text-highlighted leading-tight"
+															>
+																{{ opt.name }}
+															</p>
+															<p
+																v-if="opt.price !== null"
+																class="text-xs text-primary-600 dark:text-primary-400 font-semibold mt-0.5"
+															>
+																₴{{ opt.price.toFixed(2) }}
+															</p>
+															<p v-if="opt.weight" class="text-xs text-muted">
+																{{ opt.weight }} г
+															</p>
+														</div>
+														<UButton
+															size="xs"
+															variant="ghost"
+															icon="i-lucide-info"
+															class="absolute top-1 right-1 size-6! p-0! bg-black/30 text-white hover:bg-black/50"
+															@click.stop="openDishInfo(opt)"
+														/>
+														<div
+															v-if="course.selected_option_id === opt.id"
+															class="absolute top-1 left-1"
 														>
-															₴{{ opt.price.toFixed(2) }}
-														</p>
-														<p v-if="opt.weight" class="text-xs text-muted">
-															{{ opt.weight }} г
-														</p>
+															<UIcon
+																name="i-lucide-check-circle"
+																class="size-5 text-primary-500"
+															/>
+														</div>
 													</div>
-													<UButton
-														size="xs"
-														variant="ghost"
-														icon="i-lucide-info"
-														class="absolute top-1 right-1 size-6! p-0! bg-black/30 text-white hover:bg-black/50"
-														@click.stop="openDishInfo(opt)"
-													/>
 													<div
-														v-if="course.selected_option_id === opt.id"
-														class="absolute top-1 left-1"
+														class="relative rounded-lg border-2 cursor-pointer transition-all flex items-center justify-center h-full min-h-15"
+														:class="
+															course.selected_option_id === null
+																? 'border-primary-500 bg-primary-50 dark:bg-primary-950'
+																: 'border-default hover:border-primary-300'
+														"
+														@click="onCourseOptionSelect(course, null)"
 													>
-														<UIcon
-															name="i-lucide-check-circle"
-															class="size-5 text-primary-500"
-														/>
+														<span class="text-xs text-muted">
+															{{ $t("dashboard.no_selection") }}
+														</span>
 													</div>
 												</div>
-												<div
-													class="relative rounded-lg border-2 cursor-pointer transition-all flex items-center justify-center h-full min-h-15"
-													:class="
-														course.selected_option_id === null
-															? 'border-primary-500 bg-primary-50 dark:bg-primary-950'
-															: 'border-default hover:border-primary-300'
-													"
-													@click="onCourseOptionSelect(course, null)"
-												>
-													<span class="text-xs text-muted">
-														{{ $t("dashboard.no_selection") }}
-													</span>
-												</div>
+												<p v-else class="text-xs text-muted">
+													{{ $t("dashboard.no_dish_choices") }}
+												</p>
 											</div>
-											<p v-else class="text-xs text-muted">
-												{{ $t("dashboard.no_dish_choices") }}
-											</p>
 										</div>
 									</div>
-								</div>
+								</template>
+								<template v-else>
+									<div class="animate-pulse space-y-3">
+										<div
+											class="rounded-xl border border-default overflow-hidden"
+										>
+											<div class="px-4 py-2 bg-elevated/40 h-9" />
+											<div class="px-4 py-3 space-y-2">
+												<div class="h-4 bg-elevated rounded w-24" />
+												<div class="grid grid-cols-2 gap-2">
+													<div class="h-28 bg-elevated rounded-lg" />
+													<div class="h-28 bg-elevated rounded-lg" />
+													<div class="h-28 bg-elevated rounded-lg" />
+												</div>
+											</div>
+										</div>
+									</div>
+								</template>
 							</div>
 						</div>
 					</div>
