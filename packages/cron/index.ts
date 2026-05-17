@@ -130,6 +130,8 @@ async function tick(time: string) {
 			.filter((d) => d.telegram_id != null)
 			.map((d) =>
 				limit(async () => {
+					console.log(`Sending message to diner ${d.id}`);
+
 					const selections = selectionsByDiner.get(d.id) ?? [];
 					const text = [
 						t(d.telegram_lang, "greeting", { name: d.first_name }),
@@ -161,6 +163,8 @@ async function tick(time: string) {
 			.filter((g) => g.telegram_id != null)
 			.map((g) =>
 				limit(async () => {
+					console.log(`Sending message to guardian ${g.id}`);
+
 					const childLines = g.Diners.map(({ Diner: child }) => {
 						const sel = selectionsByDiner.get(child.id) ?? [];
 						return (
