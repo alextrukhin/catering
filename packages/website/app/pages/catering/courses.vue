@@ -30,7 +30,10 @@ const saving = ref(false);
 const deleting = ref<number | null>(null);
 
 const mealOptions = computed(() =>
-	(meals.value ?? []).map((m) => ({ label: m.label_uk, value: m.id }))
+	(meals.value ?? []).map((m) => ({
+		label: m[`label_${locale.value}`] || m.label_uk,
+		value: m.id,
+	}))
 );
 
 function openCreate() {
@@ -316,7 +319,7 @@ const columns = computed((): TableColumn<CourseRow>[] => [
 const rows = computed((): CourseRow[] =>
 	(courses.value ?? []).map((c) => ({
 		...c,
-		mealLabel: c.Meal.label_uk,
+		mealLabel: c.Meal[`label_${locale.value}`] || c.Meal.label_uk,
 		periods: c.Periods.length,
 		options: c.Options.length,
 	}))
@@ -437,7 +440,7 @@ const rows = computed((): CourseRow[] =>
 	<!-- Periods slideover -->
 	<USlideover
 		v-model:open="periodOpen"
-		:title="`Periods — ${activeCourse?.label_uk}`"
+		:title="`Periods — ${activeCourse ? activeCourse[`label_${locale}`] || activeCourse.label_uk : ''}`"
 		side="right"
 	>
 		<template #body>

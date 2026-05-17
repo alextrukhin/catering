@@ -125,7 +125,7 @@ const groups = computed(() => [
 			</template>
 		</UDashboardSidebar>
 
-		<UDashboardSearch :groups="groups" />
+		<UDashboardSearch :groups />
 
 		<slot />
 

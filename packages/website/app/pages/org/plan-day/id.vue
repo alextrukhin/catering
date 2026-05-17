@@ -28,9 +28,9 @@ const cols = computed<ColDef[]>(() => {
 	return day.value.MealPlan.Meals.flatMap((pm) =>
 		pm.Courses.map((pc) => ({
 			planMealId: pm.id,
-			mealLabel: pm.Meal.label_uk,
+			mealLabel: pm.Meal[`label_${locale.value}`] || pm.Meal.label_uk,
 			planCourseId: pc.id,
-			courseLabel: pc.Course.label_uk,
+			courseLabel: pc.Course[`label_${locale.value}`] || pc.Course.label_uk,
 		}))
 	);
 });
@@ -168,7 +168,7 @@ async function removeDiner(planDayDinerId: number) {
 					<div v-if="day" class="flex flex-col leading-tight">
 						<span class="font-semibold capitalize">{{ dateLabel }}</span>
 						<span class="text-xs text-muted font-normal">
-							{{ day.MealPlan.label_uk }}
+							{{ day.MealPlan[`label_${locale}`] || day.MealPlan.label_uk }}
 						</span>
 					</div>
 					<span v-else class="text-muted">Loading…</span>

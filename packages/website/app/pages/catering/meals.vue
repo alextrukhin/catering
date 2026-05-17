@@ -7,7 +7,7 @@ const UBtn = resolveComponent("UButton");
 
 const { $client } = useNuxtApp();
 const toast = useToast();
-const { t } = useI18n();
+const { t, locale } = useI18n();
 
 const { data: meals, refresh } = $client.catering.meals.list.useQuery();
 
@@ -270,7 +270,7 @@ const rows = computed((): MealRow[] =>
 	<!-- Periods slideover -->
 	<USlideover
 		v-model:open="periodOpen"
-		:title="`Periods — ${activeMeal?.label_uk}`"
+		:title="`Periods — ${activeMeal ? activeMeal[`label_${locale}`] || activeMeal.label_uk : ''}`"
 		side="right"
 	>
 		<template #body>

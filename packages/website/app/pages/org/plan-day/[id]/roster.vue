@@ -160,7 +160,7 @@ const dateLabel = computed(() =>
 						<span class="font-semibold capitalize">{{ dateLabel }}</span>
 						<span class="text-xs text-muted font-normal">
 							{{
-								data.day.MealPlan[`label_${locale.value}`] ||
+								data.day.MealPlan[`label_${locale}`] ||
 								data.day.MealPlan.label_uk
 							}}
 							&mdash; manage diners

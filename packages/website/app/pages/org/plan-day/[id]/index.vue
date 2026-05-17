@@ -28,9 +28,9 @@ const cols = computed<ColDef[]>(() => {
 	return day.value.MealPlan.Meals.flatMap((pm) =>
 		pm.Courses.map((pc) => ({
 			planMealId: pm.id,
-			mealLabel: pm.Meal.label_uk,
+			mealLabel: pm.Meal[`label_${locale.value}`] || pm.Meal.label_uk,
 			planCourseId: pc.id,
-			courseLabel: pc.Course.label_uk,
+			courseLabel: pc.Course[`label_${locale.value}`] || pc.Course.label_uk,
 		}))
 	);
 });

@@ -461,7 +461,7 @@ function getCourseIds(pm: PlanMealItem) {
 	<!-- Manage meals -->
 	<USlideover
 		v-model:open="mealsOpen"
-		:title="`Meals — ${activePlan?.label_uk}`"
+		:title="`Meals — ${activePlan ? activePlan[`label_${locale}`] || activePlan.label_uk : ''}`"
 		side="right"
 	>
 		<template #body>
@@ -476,7 +476,9 @@ function getCourseIds(pm: PlanMealItem) {
 							class="rounded-lg border border-default p-3"
 						>
 							<div class="flex items-center justify-between mb-2">
-								<span class="font-medium">{{ pm.Meal.label_uk }}</span>
+								<span class="font-medium">
+									{{ pm.Meal[`label_${locale}`] || pm.Meal.label_uk }}
+								</span>
 								<UButton
 									size="xs"
 									color="error"
@@ -498,7 +500,9 @@ function getCourseIds(pm: PlanMealItem) {
 									class="rounded border border-default p-2 mb-1"
 								>
 									<div class="flex items-center justify-between text-sm mb-1.5">
-										<span>{{ c.Course.label_uk }}</span>
+										<span>
+											{{ c.Course[`label_${locale}`] || c.Course.label_uk }}
+										</span>
 										<UButton
 											size="xs"
 											variant="ghost"
@@ -535,7 +539,7 @@ function getCourseIds(pm: PlanMealItem) {
 									:key="ac.id"
 									class="flex items-center justify-between text-sm text-muted"
 								>
-									<span>{{ ac.label_uk }}</span>
+									<span>{{ ac[`label_${locale}`] || ac.label_uk }}</span>
 									<UButton
 										size="xs"
 										variant="ghost"
@@ -603,7 +607,7 @@ function getCourseIds(pm: PlanMealItem) {
 	<!-- Manage days -->
 	<USlideover
 		v-model:open="daysOpen"
-		:title="`Days — ${activePlanDays?.label_uk}`"
+		:title="`Days — ${activePlanDays ? activePlanDays[`label_${locale}`] || activePlanDays.label_uk : ''}`"
 		side="right"
 	>
 		<template #body>
