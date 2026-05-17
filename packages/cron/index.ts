@@ -58,9 +58,9 @@ async function tick(time: string) {
 		if (!org.bot_token) continue;
 
 		const bot = new Bot(org.bot_token, { client: { timeoutSeconds: 10 } });
-		// bot.api.config.use(
-		// 	autoRetry({ maxRetryAttempts: 3, maxDelaySeconds: 120 })
-		// );
+		bot.api.config.use(
+			autoRetry({ maxRetryAttempts: 3, maxDelaySeconds: 120 })
+		);
 		const limit = pLimit(MSG_PER_SECOND);
 
 		const planDayDiners = await db.planDayDiner.findMany({
