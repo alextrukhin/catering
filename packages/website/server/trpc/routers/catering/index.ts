@@ -5,6 +5,7 @@ import meals from "./meals";
 import courses from "./courses";
 import dishes from "./dishes";
 import inviteCodes from "./invite-codes";
+import portionsReport from "./portions-report";
 
 export default router({
 	user,
@@ -13,4 +14,5 @@ export default router({
 	courses,
 	dishes,
 	inviteCodes,
+	portionsReport,
 });

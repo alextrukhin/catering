@@ -158,7 +158,7 @@ const availableDiners = computed(() =>
 );
 
 const columns = computed((): TableColumn<Group>[] => [
-	{ accessorKey: "name", header: t("op.col_group_name") },
+	{ accessorKey: `name_${locale.value}`, header: t("op.col_group_name") },
 	{
 		id: "members",
 		header: t("op.col_members"),

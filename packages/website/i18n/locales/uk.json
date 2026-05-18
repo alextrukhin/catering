@@ -229,7 +229,8 @@
 		"diner_groups": "Групи учнів",
 		"meal_plans": "Плани харчування",
 		"calendar": "Календар",
-		"go_to": "Перейти до"
+		"go_to": "Перейти до",
+		"portions_report": "Звіт про порції"
 	},
 	"ct": {
 		"active_contracts": "Активні договори",
@@ -305,7 +306,15 @@
 		"dish_remove_photo": "Видалити фото",
 		"dish_undo": "Скасувати",
 		"dish_photo_pending": "Фото буде видалено при збереженні.",
-		"dish_open": "відкрито"
+		"dish_open": "відкрито",
+		"portions_report_title": "Звіт про порції",
+		"portions_col_org": "Організація",
+		"portions_col_meal": "Прийом їжі",
+		"portions_col_count": "Порції",
+		"portions_date_label": "Дата",
+		"portions_refresh": "Оновити",
+		"portions_no_data": "Немає даних на цю дату.",
+		"portions_total": "Всього"
 	},
 	"op": {
 		"active_contracts": "Активні договори",

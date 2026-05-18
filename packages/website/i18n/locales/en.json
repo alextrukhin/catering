@@ -229,7 +229,8 @@
 		"diner_groups": "Diner Groups",
 		"meal_plans": "Meal Plans",
 		"calendar": "Calendar",
-		"go_to": "Go to"
+		"go_to": "Go to",
+		"portions_report": "Portions Report"
 	},
 	"ct": {
 		"active_contracts": "Active Contracts",
@@ -305,7 +306,15 @@
 		"dish_remove_photo": "Remove photo",
 		"dish_undo": "Undo",
 		"dish_photo_pending": "Photo will be removed on save.",
-		"dish_open": "open"
+		"dish_open": "open",
+		"portions_report_title": "Portions Report",
+		"portions_col_org": "Organization",
+		"portions_col_meal": "Meal",
+		"portions_col_count": "Portions",
+		"portions_date_label": "Date",
+		"portions_refresh": "Refresh",
+		"portions_no_data": "No data for this date.",
+		"portions_total": "Total"
 	},
 	"op": {
 		"active_contracts": "Active Contracts",

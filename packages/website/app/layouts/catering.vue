@@ -56,6 +56,12 @@ const links = computed((): NavigationMenuItem[][] => [
 			onSelect: close,
 		},
 		{
+			label: t("nav.portions_report"),
+			icon: "i-lucide-bar-chart-2",
+			to: "/catering/portions-report",
+			onSelect: close,
+		},
+		{
 			label: t("nav.settings"),
 			to: "/catering/settings",
 			icon: "i-lucide-settings",
