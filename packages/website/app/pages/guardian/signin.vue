@@ -112,6 +112,7 @@ const loginWithPasskey = async () => {
 		});
 		router.replace("/guardian/dashboard");
 	} catch (e) {
+		console.error(e);
 		error.value =
 			e instanceof TRPCClientError ? e.message : t("auth.failed_passkey_login");
 		captureException(e);
