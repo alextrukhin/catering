@@ -468,7 +468,7 @@ async function executeCopy() {
 															₴{{ opt.price.toFixed(2) }}
 														</p>
 														<p v-if="opt.weight" class="text-xs text-muted">
-															{{ opt.weight }} г
+															{{ opt.weight }} {{ t("g") }}
 														</p>
 													</div>
 													<UButton
@@ -605,7 +605,7 @@ async function executeCopy() {
 				/>
 				<div v-if="dishInfoItem?.weight" class="flex gap-2 text-sm">
 					<span class="font-medium">{{ $t("dashboard.weight") }}:</span>
-					<span class="text-muted">{{ dishInfoItem.weight }} г</span>
+					<span class="text-muted">{{ dishInfoItem.weight }} {{ t("g") }}</span>
 				</div>
 				<div v-if="dishInfoItem?.price !== null" class="flex gap-2 text-sm">
 					<span class="font-medium">{{ $t("dashboard.price") }}:</span>
