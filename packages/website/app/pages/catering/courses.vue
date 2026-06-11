@@ -270,7 +270,7 @@ type CourseRow = Course & {
 };
 
 const columns = computed((): TableColumn<CourseRow>[] => [
-	{ accessorKey: "label_uk", header: t("ct.course_col") },
+	{ accessorKey: `label_${locale.value}`, header: t("ct.course_col") },
 	{ accessorKey: "mealLabel", header: t("ct.course_meal_col") },
 	{
 		accessorKey: "options",
