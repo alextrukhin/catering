@@ -44,7 +44,7 @@ export default router({
 							id: true,
 							CourseOption: {
 								select: {
-									Dish: { select: { name_uk: true, name_en: true } },
+									Dish: { select: { id: true, name_uk: true, name_en: true } },
 								},
 							},
 						},
@@ -59,9 +59,11 @@ export default router({
 					0
 				);
 				const selectedCourses = r.DishSelections.length;
-				const dishNames = r.DishSelections.map(
-					(s) => s.CourseOption.Dish.name_uk
-				);
+				const dishNames = r.DishSelections.map((s) => ({
+					id: s.CourseOption.Dish.id,
+					name_uk: s.CourseOption.Dish.name_uk,
+					name_en: s.CourseOption.Dish.name_en,
+				}));
 				return {
 					id: r.id,
 					date: r.PlanDay.date,

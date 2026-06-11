@@ -69,7 +69,9 @@ export default router({
 						select: {
 							id: true,
 							CourseOption: {
-								select: { Dish: { select: { name_uk: true, name_en: true } } },
+								select: {
+									Dish: { select: { id: true, name_uk: true, name_en: true } },
+								},
 							},
 						},
 					},
@@ -91,7 +93,11 @@ export default router({
 					total_courses: totalCourses,
 					selected_courses: selectedCourses,
 					is_complete: totalCourses > 0 && selectedCourses >= totalCourses,
-					dish_names: r.DishSelections.map((s) => s.CourseOption.Dish.name_uk),
+					dish_names: r.DishSelections.map((s) => ({
+						id: s.CourseOption.Dish.id,
+						name_uk: s.CourseOption.Dish.name_uk,
+						name_en: s.CourseOption.Dish.name_en,
+					})),
 				};
 			});
 		}),

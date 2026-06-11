@@ -416,14 +416,18 @@ async function executeCopy() {
 										{{ formatDay(d.date) }}
 									</span>
 									<span class="text-muted">
-										{{ locale === "uk" ? d.plan_label_uk : d.plan_label_en }}
+										{{ d[`plan_label_${locale}`] || d.plan_label_uk }}
 									</span>
 								</div>
 								<p
 									v-if="d.dish_names.length > 0"
 									class="text-xs text-muted/70 mt-0.5 truncate"
 								>
-									{{ d.dish_names.join(", ") }}
+									{{
+										d.dish_names
+											.map((n) => n[`name_${locale}`] || n.name_uk)
+											.join(", ")
+									}}
 								</p>
 							</div>
 							<div class="flex items-center gap-2 shrink-0 ml-2">
