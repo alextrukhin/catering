@@ -6,7 +6,7 @@ definePageMeta({ layout: "catering" });
 const UBtn = resolveComponent("UButton");
 const { $client } = useNuxtApp();
 const toast = useToast();
-const { t } = useI18n();
+const { t, locale } = useI18n();
 
 const { data: dishes, refresh } = $client.catering.dishes.list.useQuery();
 
@@ -217,7 +217,7 @@ const columns = computed((): TableColumn<Dish>[] => [
 						"—"
 					),
 	},
-	{ accessorKey: "name_uk", header: t("common.name") },
+	{ accessorKey: `name_${locale.value}`, header: t("common.name") },
 	{
 		id: "valid_from",
 		header: t("ct.dish_available_from"),

@@ -171,7 +171,7 @@ async function deletePeriod(id: number) {
 type MealRow = Meal & { courses: number; periods: number };
 
 const columns = computed((): TableColumn<MealRow>[] => [
-	{ accessorKey: "label_uk", header: t("ct.meal_col") },
+	{ accessorKey: `label_${locale.value}`, header: t("ct.meal_col") },
 	{ accessorKey: "courses", header: t("nav.courses") },
 	{
 		accessorKey: "periods",
