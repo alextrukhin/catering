@@ -324,7 +324,7 @@ async function setDefault(
 type PlanRow = Plan & { mealsCount: number; daysCount: number };
 
 const columns = computed((): TableColumn<PlanRow>[] => [
-	{ accessorKey: "label_uk", header: t("op.plan_col") },
+	{ accessorKey: `label_${locale.value}`, header: t("op.plan_col") },
 	{
 		accessorKey: "valid_from",
 		header: t("common.from"),
